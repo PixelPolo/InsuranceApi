@@ -1,7 +1,7 @@
 package com.ricci.insuranceapi.insurance_api.controller;
 
-import com.ricci.insuranceapi.insurance_api.model.Person;
-import com.ricci.insuranceapi.insurance_api.service.PersonService;
+import com.ricci.insuranceapi.insurance_api.model.Company;
+import com.ricci.insuranceapi.insurance_api.service.CompanyService;
 
 import java.net.URI;
 import java.util.List;
@@ -14,31 +14,31 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/${api.version}/clients/persons")
-public class PersonController {
+@RequestMapping("/api/${api.version}/clients/companies")
+public class CompanyController {
 
-    private final PersonService personService;
+    private final CompanyService companyService;
 
     @Autowired
-    public PersonController(PersonService personService) {
-        this.personService = personService;
+    public CompanyController(CompanyService companyService) {
+        this.companyService = companyService;
     }
 
-    // POST /api/v_/clients/persons
+    // POST /api/v_/clients/companies
     @PostMapping
-    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
-        Person created = personService.createPerson(person);
+    public ResponseEntity<Company> createCompany(@RequestBody Company company) {
+        Company created = companyService.createCompany(company);
         String apiVersion = System.getProperty("api.version", "v1");
-        // We get the client only with /clients/{id} and not /clients/persons/{id}
+        // We get the client only with /clients/{id} and not /clients/companies/{id}
         URI location = URI.create("/api/" + apiVersion + "/clients/" + created.getClientId());
         return ResponseEntity.created(location).body(created); // 201 Created
     }
 
     // --- EXTRA ---
 
-    // GET /api/v_/clients/persons?page=0&size=5&sortBy=name&sortDir=asc
+    // GET /api/v_/clients/companies?page=0&size=5&sortBy=name&sortDir=asc
     @GetMapping
-    public ResponseEntity<List<Person>> getAllPersons(
+    public ResponseEntity<List<Company>> getAllCompanies(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -49,10 +49,10 @@ public class PersonController {
                 : Sort.by(sortBy).ascending();
 
         PageRequest pageRequest = PageRequest.of(page, size, sort);
-        Page<Person> persons = personService.getAllPersons(pageRequest);
+        Page<Company> companies = companyService.getAllCompanies(pageRequest);
 
-        return persons.isEmpty()
+        return companies.isEmpty()
                 ? ResponseEntity.noContent().build() // 204 No Content
-                : ResponseEntity.ok(persons.getContent()); // 200 OK
+                : ResponseEntity.ok(companies.getContent()); // 200 OK
     }
 }
