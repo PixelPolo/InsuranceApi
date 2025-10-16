@@ -1,10 +1,11 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
@@ -21,8 +22,8 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
+    public Page<Client> getAllClients(Pageable pageable) {
+        return clientRepository.findAll(pageable);
     }
 
     public Client getClient(UUID id) {

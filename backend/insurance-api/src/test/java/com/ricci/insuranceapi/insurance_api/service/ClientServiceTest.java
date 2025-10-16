@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -51,19 +52,21 @@ class ClientServiceTest {
     // Read -> Find All Clients
     @Test
     void shouldFindAllClients() {
-        List<Client> clients = clientService.getAllClients();
+        Page<Client> clients = clientService.getAllClients(PageRequest.of(0, 10));
 
-        assertThat(clients).isNotNull().hasSize(3);
+        assertThat(clients.getContent()).isNotNull().hasSize(3);
 
         if (verbose) {
-            log.info("Clients found: {}", clients);
+            log.info("Clients found: {}", clients.getContent());
         }
     }
 
     // Read -> Find By ID
     @Test
     void shouldFindClientById() {
-        Client first = clientService.getAllClients().get(0);
+        Client first = clientService.getAllClients(
+                PageRequest.of(0, 1))
+                .getContent().get(0);
         Client found = clientService.getClient(first.getClientId());
 
         assertThat(found).isNotNull();
@@ -84,6 +87,22 @@ class ClientServiceTest {
         });
     }
 
+    // Read -> Pagination
+    @Test
+    void shouldReturnSingleClientWithPagination() {
+        Page<Client> page = clientService.getAllClients(PageRequest.of(0, 1));
+
+        assertThat(page.getContent()).hasSize(1);
+        assertThat(page.getTotalElements()).isEqualTo(3);
+
+        Client first = page.getContent().get(0);
+        assertThat(first).isNotNull();
+
+        if (verbose) {
+            log.info("Page 0 (size 1) returned client: {}", first);
+        }
+    }
+
     // Create -> Insert New Client
     @Test
     void shouldCreateNewClient() {
@@ -94,8 +113,8 @@ class ClientServiceTest {
 
         clientService.createClient(client);
 
-        List<Client> all = clientService.getAllClients();
-        assertThat(all).hasSize(4);
+        Page<Client> all = clientService.getAllClients(PageRequest.of(0, 10));
+        assertThat(all.getTotalElements()).isEqualTo(4);
 
         if (verbose) {
             log.info("New client created: {}", client);
@@ -105,7 +124,10 @@ class ClientServiceTest {
     // Update -> Update existing Client
     @Test
     void shouldUpdateClient() {
-        Client existing = clientService.getAllClients().get(0);
+        Client existing = clientService.getAllClients(PageRequest.of(0, 1))
+                .getContent()
+                .get(0);
+
         Client updates = new Client();
         updates.setName("Updated Name");
         updates.setEmail("updated@example.com");
@@ -124,7 +146,9 @@ class ClientServiceTest {
     // Delete -> Soft Delete Client
     @Test
     void shouldSoftDeleteClient() {
-        Client client = clientService.getAllClients().get(0);
+        Client client = clientService.getAllClients(PageRequest.of(0, 1))
+                .getContent()
+                .get(0);
 
         Client deleted = clientService.deleteClient(client.getClientId());
 
@@ -139,7 +163,9 @@ class ClientServiceTest {
     // Delete -> Already Deleted
     @Test
     void shouldNotReDeleteAlreadyDeletedClient() {
-        Client client = clientService.getAllClients().get(0);
+        Client client = clientService.getAllClients(PageRequest.of(0, 1))
+                .getContent()
+                .get(0);
 
         // First deletion
         Client firstDelete = clientService.deleteClient(client.getClientId());
@@ -150,4 +176,5 @@ class ClientServiceTest {
         assertThat(secondDelete.getIsDeleted()).isTrue();
         assertThat(secondDelete.getDeletionDate()).isEqualTo(firstDelete.getDeletionDate());
     }
+
 }
