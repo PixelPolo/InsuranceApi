@@ -88,7 +88,7 @@ public class ClientRepositoryTest {
         }
     }
 
-    // Update -> Soft Delete Client
+    // Delete -> Soft Delete Client
     @Test
     void shouldSoftDeleteClient() {
         Client client = clientRepository.findAll().get(0);
