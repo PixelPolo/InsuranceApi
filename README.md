@@ -26,6 +26,7 @@ For this attempt, I relied on the following tools and resources:
 To make the application easy to run, I created three Docker containers:
 
 - A PostgreSQL database with a persistent volume.
+- A dedicated PostgreSQL instance for integration and JUnit tests.
 - A pgAdmin container (optional, but useful for database inspection).
 - A backend container running the Spring Boot application.
 
@@ -49,9 +50,9 @@ After logging into pgAdmin -> "Add New Server"
 
 - General tab: any name (e.g., InsuranceDB)
 - Connection tab:
-  - Host name/address: postgres
+  - Host name/address: postgres (or postgres-test)
   - Port: 5432
-  - Maintenance database: insurance_db
+  - Maintenance database: insurance_db (or insurance_test_db)
   - Username: postgres
   - Password: postgres
 

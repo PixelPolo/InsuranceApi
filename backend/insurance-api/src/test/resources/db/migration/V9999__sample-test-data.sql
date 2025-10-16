@@ -1,4 +1,4 @@
--- V9999__sample-data.sql
+-- Same as V9999__sample-data.sql
 -- Populate the database with consistent sample data for testing
 --
 -- Ensure pgcrypto extension is available
