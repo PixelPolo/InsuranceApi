@@ -43,9 +43,9 @@ CREATE TABLE
     public."Contract" (
         "contract_id" UUID DEFAULT gen_random_uuid () PRIMARY KEY,
         "client_id" UUID NOT NULL,
-        "start_date" DATE NOT NULL, -- The backend will handle the default as current ISO 8601
-        "end_date" DATE,
-        "update_date" DATE DEFAULT CURRENT_DATE,
+        "start_date" TIMESTAMP NOT NULL, -- The backend will handle the default as current ISO 8601
+        "end_date" TIMESTAMP,
+        "update_date" TIMESTAMP NOT NULL,
         "cost_amount" NUMERIC(16, 4) NOT NULL, -- 16 digits, 4 decimals
         -- Many contract could be sign by one client
         CONSTRAINT fk_contract_client_id FOREIGN KEY ("client_id") REFERENCES public."Client" ("client_id")
