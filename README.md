@@ -90,5 +90,11 @@ As mentioned above, Docker is used to containerize the full environment to ensur
 
 ## Step 3: Setup Git
 
-A customized `.gitignore` was added at the project root to exclude IDE files, build artefacts, and confidential documents.  
-For simplicity, environment variables are hardcoded in `docker-compose.yml` and `application.properties` instead of using a `.env` file.
+A customized `.gitignore` was added at the project root to exclude  
+IDE files, build artefacts, and confidential documents.  
+For simplicity, environment variables are hardcoded in  
+`docker-compose.yml` and `application.properties` instead of using a `.env` file.
+
+## Step 4: Backend implementation
+
+In progres...
