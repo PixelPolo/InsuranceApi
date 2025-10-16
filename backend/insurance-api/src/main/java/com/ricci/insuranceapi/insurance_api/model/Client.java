@@ -1,4 +1,5 @@
 // https://docs.hibernate.org/orm/current/userguide/html_single/
+// https://docs.hibernate.org/orm/current/userguide/html_single/#entity-inheritance-joined-table
 // https://medium.com/devdomain/using-lombok-in-spring-boot-simplifying-your-code-c38057894cb8
 
 package com.ricci.insuranceapi.insurance_api.model;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "client")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
