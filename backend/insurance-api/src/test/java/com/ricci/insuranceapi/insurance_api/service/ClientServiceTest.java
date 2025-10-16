@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * interacting with the ClientRepository and database.
  * The database is reset before each test using the sample Flyway script:
  * backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * Inspired by Spring Academy materials.
  */
 
 @SpringBootTest
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ClientServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(ClientServiceTest.class);
-    private static final boolean verbose = true;
+    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose"));
 
     @Autowired
     private ClientService clientService;

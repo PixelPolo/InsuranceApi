@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE
     public.client (
         "client_id" UUID DEFAULT gen_random_uuid () PRIMARY KEY,
-        "phone" VARCHAR(16),
+        "phone" VARCHAR(16) UNIQUE,
         "email" VARCHAR(128) UNIQUE,
         "name" VARCHAR(64),
         -- Soft deletion for archives

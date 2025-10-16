@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * between Spring Boot, Hibernate, and the PostgreSQL database.
  * Test data is injected by the Flyway migration tool from:
  * backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * Inspired by Spring Academy materials.
  */
 
 @SpringBootTest
@@ -30,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ClientRepositoryTest {
 
     private static final Logger log = LoggerFactory.getLogger(ClientRepositoryTest.class);
-    private static final Boolean verbose = true;
+    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose"));
 
     @Autowired
     private ClientRepository clientRepository;
