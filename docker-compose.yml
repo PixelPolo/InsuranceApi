@@ -1,0 +1,78 @@
+# https://medium.com/@vishal.sharma./run-postgresql-and-pgadmin-using-docker-compose-34120618bcf9
+# Helped with ChatGPT
+
+services:
+  # ============================================
+  # POSTGRES DATABASE
+  # ============================================
+  postgres:
+    image: postgres
+    container_name: insurance_postgresql
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: insurance_db # create the database
+    volumes:
+      - insurance_postgres_data:/var/lib/postgresql/data
+      - ./database/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro # run init.sql
+    networks:
+      - insurance_network
+
+  # ============================================
+  # PGADMIN (optional web UI for PostgreSQL)
+  # ============================================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: insurance_pgadmin
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@insurance.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - insurance_pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - insurance_network
+
+  # ============================================
+  # SPRING BOOT BACKEND
+  # ============================================
+  insurance-api:
+    build:
+      context: ./backend/insurance-api
+      dockerfile: Dockerfile
+    container_name: insurance_api
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      SPRING_APPLICATION_NAME: insurance-api
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/insurance_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none # Don't modify the db on run -> init.sql did it once
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+    ports:
+      - "8080:8080"
+    networks:
+      - insurance_network
+
+# ============================================
+# PERSISTENT VOLUMES
+# ============================================
+volumes:
+  insurance_postgres_data:
+  insurance_pgadmin_data:
+
+# ============================================
+# SHARED NETWORK
+# ===========================================
+networks:
+  insurance_network:
+    driver: bridge
