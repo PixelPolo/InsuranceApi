@@ -142,7 +142,11 @@ class ClientControllerIntegrationTest {
 
         HttpEntity<Client> request = new HttpEntity<>(updatedClient);
 
-        ResponseEntity<Void> response = rest.exchange(path + "/" + id, HttpMethod.PUT, request, Void.class);
+        // This was to test PUT, replaced for requirements
+        // ResponseEntity<Void> response = rest.exchange(path + "/" + id,
+        // HttpMethod.PUT, request, Void.class);
+
+        ResponseEntity<Void> response = rest.exchange(path + "/" + id, HttpMethod.PATCH, request, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         ResponseEntity<String> getResponse = rest.getForEntity(path + "/" + id, String.class);
@@ -156,7 +160,8 @@ class ClientControllerIntegrationTest {
         assertThat(email).isEqualTo("updated@example.com");
 
         if (verbose) {
-            log.info("PUT {}/{} → {}", path, id, name);
+            // log.info("PUT {}/{} → {}", path, id, name);
+            log.info("PACTH {}/{} → {}", path, id, name);
         }
     }
 

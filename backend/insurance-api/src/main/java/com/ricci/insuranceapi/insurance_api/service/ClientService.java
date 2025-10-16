@@ -35,11 +35,28 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
+    // PUT method -> set other attributes to null 
+    // (not ok with requirements for Person.birthday and Company.companyIdentifier)
+    // public Client updateClient(UUID id, Client updates) {
+    // Client existing = this.getClient(id);
+    // existing.setName(updates.getName());
+    // existing.setEmail(updates.getEmail());
+    // existing.setPhone(updates.getPhone());
+    // return clientRepository.save(existing);
+    // }
+
+    // PATCH method -> partial update
     public Client updateClient(UUID id, Client updates) {
         Client existing = this.getClient(id);
-        existing.setName(updates.getName());
-        existing.setEmail(updates.getEmail());
-        existing.setPhone(updates.getPhone());
+        if (updates.getName() != null) {
+            existing.setName(updates.getName());
+        }
+        if (updates.getEmail() != null) {
+            existing.setEmail(updates.getEmail());
+        }
+        if (updates.getPhone() != null) {
+            existing.setPhone(updates.getPhone());
+        }
         return clientRepository.save(existing);
     }
 

@@ -63,9 +63,18 @@ public class ClientController {
         return ResponseEntity.created(location).body(created); // 201 Created
     }
 
-    // PUT /api/v_/clients/{id}
-    @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable UUID id, @RequestBody Client updates) {
+    // // PUT /api/v_/clients/{id}
+    // @PutMapping("/{id}")
+    // public ResponseEntity<Client> updateClient(@PathVariable UUID id,
+    // @RequestBody Client updates) {
+    // Client updated = clientService.updateClient(id, updates); // 404 Not Found →
+    // ClientNotFoundAdvice
+    // return ResponseEntity.ok(updated); // 200 OK
+    // }
+
+    // PATCH /api/v_/clients/{id}
+    @PatchMapping("/{id}")
+    public ResponseEntity<Client> patchClient(@PathVariable UUID id, @RequestBody Client updates) {
         Client updated = clientService.updateClient(id, updates); // 404 Not Found → ClientNotFoundAdvice
         return ResponseEntity.ok(updated); // 200 OK
     }
