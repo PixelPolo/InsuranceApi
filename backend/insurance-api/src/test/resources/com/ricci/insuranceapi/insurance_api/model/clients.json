@@ -1,0 +1,26 @@
+[
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440000",
+    "phone": "+41791234567",
+    "email": "alice@example.com",
+    "name": "Alice Dupont",
+    "isDeleted": false,
+    "deletionDate": null
+  },
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440001",
+    "phone": "+41761239876",
+    "email": "bob@example.com",
+    "name": "Bob Martin",
+    "isDeleted": false,
+    "deletionDate": null
+  },
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440002",
+    "phone": "+41442223344",
+    "email": "entreprise@example.com",
+    "name": "Entreprise SA",
+    "isDeleted": false,
+    "deletionDate": null
+  }
+]

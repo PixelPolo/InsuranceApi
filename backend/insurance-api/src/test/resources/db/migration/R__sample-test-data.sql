@@ -1,14 +1,11 @@
 -- Same as V9999__sample-data.sql
 -- Populate the database with consistent sample data for testing
 --
--- Clean existing data
-DELETE FROM contract;
-
-DELETE FROM person;
-
-DELETE FROM company;
-
-DELETE FROM client;
+-- Clean tables (reset + cascade dependencies)
+TRUNCATE TABLE contract,
+person,
+company,
+client RESTART IDENTITY CASCADE;
 
 -- Ensure pgcrypto extension is available
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
