@@ -15,14 +15,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.ricci.insuranceapi.insurance_api.model.Client;
+import com.ricci.insuranceapi.insurance_api.model.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /*
  * This class tests the ClientRepository to verify the communication
  * between Spring Boot, Hibernate, and the PostgreSQL database.
- * Test data is injected by the Flyway migration tool from:
- * backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
  * Inspired by Spring Academy materials.
  */
 
@@ -72,9 +72,10 @@ public class ClientRepositoryTest {
     }
 
     // Create -> Insert New Client
+    // Test adapted since Client as an abstract class
     @Test
     void shouldCreateNewClient() {
-        Client client = new Client();
+        Client client = new Person();
         client.setName("John Doe");
         client.setEmail("john.doe@example.com");
         client.setPhone("+41770000000");

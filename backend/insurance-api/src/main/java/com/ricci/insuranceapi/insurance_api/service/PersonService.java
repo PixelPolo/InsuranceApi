@@ -11,14 +11,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class PersonService {
 
+    // TODO - Improve the service according requirements
+
     private final PersonRepository personRepository;
+    private final ClientService clientService;
 
     @Autowired
-    public PersonService(PersonRepository repository) {
-        this.personRepository = repository;
+    public PersonService(PersonRepository personRepository, ClientService clientService) {
+        this.personRepository = personRepository;
+        this.clientService = clientService;
     }
 
     public Person createPerson(Person person) {
+        clientService.validateCommonFields(person);
         return personRepository.save(person);
     }
 

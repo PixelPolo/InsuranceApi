@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
 import com.ricci.insuranceapi.insurance_api.model.Client;
+import com.ricci.insuranceapi.insurance_api.model.Person;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /*
  * This class tests the ClientService layer to verify the business logic
  * interacting with the ClientRepository and database.
- * The database is reset before each test using the sample Flyway script:
- * backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
  * Inspired by Spring Academy materials.
  */
 
@@ -104,43 +105,31 @@ class ClientServiceTest {
         }
     }
 
-    // Create -> Insert New Client
+    // Partial update
     @Test
-    void shouldCreateNewClient() {
-        Client client = new Client();
-        client.setName("John Doe");
-        client.setEmail("john.doe@example.com");
-        client.setPhone("+41770000000");
+    void shouldPartiallyUpdateClient() {
+        Client existing = clientService.getAllClients(PageRequest.of(0, 1)).getContent().get(0);
+        UUID id = existing.getClientId();
 
-        clientService.createClient(client);
+        String oldPhone = existing.getPhone();
 
-        Page<Client> all = clientService.getAllClients(PageRequest.of(0, 10));
-        assertThat(all.getTotalElements()).isEqualTo(4);
+        Map<String, Object> updates = Map.of(
+                "name", "Updated Name",
+                "email", "updated@example.com");
+
+        Client updated = clientService.partialUpdate(id, updates);
+
+        // Cast to Person to check birthdate
+        Person updatedPerson = (Person) updated;
+        Person existingPerson = (Person) existing;
+
+        assertThat(updatedPerson.getName()).isEqualTo("Updated Name");
+        assertThat(updatedPerson.getEmail()).isEqualTo("updated@example.com");
+        assertThat(updatedPerson.getPhone()).isEqualTo(oldPhone); // unchanged
+        assertThat(updatedPerson.getBirthdate()).isEqualTo(existingPerson.getBirthdate()); // unchanged
 
         if (verbose) {
-            log.info("New client created: {}", client);
-        }
-    }
-
-    // Update -> Update existing Client
-    @Test
-    void shouldUpdateClient() {
-        Client existing = clientService.getAllClients(PageRequest.of(0, 1))
-                .getContent()
-                .get(0);
-
-        Client updates = new Client();
-        updates.setName("Updated Name");
-        updates.setEmail("updated@example.com");
-        updates.setPhone("+41771111111");
-
-        Client updated = clientService.updateClient(existing.getClientId(), updates);
-
-        assertThat(updated.getName()).isEqualTo("Updated Name");
-        assertThat(updated.getEmail()).isEqualTo("updated@example.com");
-
-        if (verbose) {
-            log.info("Client updated: {}", updated);
+            log.info("Client partially updated: {}", updated);
         }
     }
 
@@ -177,5 +166,57 @@ class ClientServiceTest {
         assertThat(secondDelete.getIsDeleted()).isTrue();
         assertThat(secondDelete.getDeletionDate()).isEqualTo(firstDelete.getDeletionDate());
     }
+
+    /*
+     * Since Client as an abstract class
+     * POST are on /clients/persons or /clients/companies
+     * instead on /clients
+     */
+
+    // // Create -> Insert New Client
+    // @Test
+    // void shouldCreateNewClient() {
+    // Client client = new Client();
+    // client.setName("John Doe");
+    // client.setEmail("john.doe@example.com");
+    // client.setPhone("+41770000000");
+
+    // clientService.createClient(client);
+
+    // Page<Client> all = clientService.getAllClients(PageRequest.of(0, 10));
+    // assertThat(all.getTotalElements()).isEqualTo(4);
+
+    // if (verbose) {
+    // log.info("New client created: {}", client);
+    // }
+    // }
+
+    /*
+     * PUT test was replaced by PATCH
+     * Due to partial update logic according requierements:
+     * We do not update birthdate or company_identifier
+     */
+
+    // // Update -> Update existing Client
+    // @Test
+    // void shouldUpdateClient() {
+    // Client existing = clientService.getAllClients(PageRequest.of(0, 1))
+    // .getContent()
+    // .get(0);
+
+    // Client updates = new Client();
+    // updates.setName("Updated Name");
+    // updates.setEmail("updated@example.com");
+    // updates.setPhone("+41771111111");
+
+    // Client updated = clientService.updateClient(existing.getClientId(), updates);
+
+    // assertThat(updated.getName()).isEqualTo("Updated Name");
+    // assertThat(updated.getEmail()).isEqualTo("updated@example.com");
+
+    // if (verbose) {
+    // log.info("Client updated: {}", updated);
+    // }
+    // }
 
 }

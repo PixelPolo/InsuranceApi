@@ -11,6 +11,6 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 public class Company extends Client {
 
-    @Column(name = "company_identifier", nullable = false, unique = true, length = 32)
+    @Column(name = "company_identifier", unique = true, length = 32)
     private String companyIdentifier;
 }

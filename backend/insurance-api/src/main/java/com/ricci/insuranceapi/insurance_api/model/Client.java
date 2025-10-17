@@ -17,14 +17,14 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Client {
+public abstract class Client {
 
     @Id
     @GeneratedValue
     @Column(name = "client_id", updatable = false, nullable = false)
     private UUID clientId;
 
-    @Column(length = 16)
+    @Column(length = 16, unique = true)
     private String phone;
 
     @Column(length = 128, unique = true)

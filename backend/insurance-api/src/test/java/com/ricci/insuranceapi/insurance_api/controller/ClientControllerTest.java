@@ -2,7 +2,6 @@ package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.ricci.insuranceapi.insurance_api.model.Client;
 
 import net.minidev.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,19 +16,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /*
  * This class performs integration tests on the ClientController.
- * It verifies the correct behavior of all REST endpoints (CRUD operations)
+ * It verifies the correct behavior of REST endpoints
  * and ensures the controller properly communicates with the service and repository layers.
- * Test data is loaded via Flyway from:
- * backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
  * Inspired by Spring Academy materials.
  */
 
@@ -91,78 +87,52 @@ class ClientControllerIntegrationTest {
         }
     }
 
-    // POST /clients
+    // PATCH /clients/{id}
     @Test
-    void shouldCreateANewClient() {
-        Client newClient = new Client();
-        newClient.setName("John Doe");
-        newClient.setEmail("john.doe@example.com");
-        newClient.setPhone("+41770000000");
+    void shouldPartiallyUpdateClient() {
+        String list = rest.getForObject(path, String.class);
+        String id = JsonPath.parse(list).read("$[0].clientId");
 
-        ResponseEntity<Void> createResponse = rest
-                .postForEntity(path, newClient, Void.class);
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        // Read original state
+        String before = rest.getForObject(path + "/" + id, String.class);
+        DocumentContext beforeJson = JsonPath.parse(before);
+        String originalPhone = beforeJson.read("$.phone", String.class);
 
-        URI locationOfNewClient = createResponse.getHeaders().getLocation();
-        assertThat(locationOfNewClient).isNotNull();
+        // We patch a Person
+        String originalBirhday = beforeJson.read("$.birthdate", String.class);
 
-        ResponseEntity<String> getResponse = rest.getForEntity(locationOfNewClient, String.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // Prepare partial update
+        String patchJson = """
+                {
+                  "name": "Patched Name",
+                  "email": "patched@example.com"
+                }
+                """;
 
-        DocumentContext json = JsonPath.parse(getResponse.getBody());
-        String name = json.read("$.name");
-        String email = json.read("$.email");
-        String phone = json.read("$.phone");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(patchJson, headers);
 
-        assertThat(name).isEqualTo("John Doe");
-        assertThat(email).isEqualTo("john.doe@example.com");
-        assertThat(phone).isEqualTo("+41770000000");
+        // Execute PATCH
+        ResponseEntity<String> patchResponse = rest.exchange(path + "/" + id, HttpMethod.PATCH, request, String.class);
+        assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        if (verbose) {
-            log.info("POST {} → {}", path, name);
-        }
-    }
+        // Verify changes
+        String after = rest.getForObject(path + "/" + id, String.class);
+        DocumentContext afterJson = JsonPath.parse(after);
 
-    // PUT /clients/{id}
-    @Test
-    void shouldUpdateAnExistingClient() {
-        ResponseEntity<Client[]> listResponse = rest.getForEntity(path, Client[].class);
+        String name = afterJson.read("$.name", String.class);
+        String email = afterJson.read("$.email", String.class);
+        String phone = afterJson.read("$.phone", String.class);
+        String birthday = afterJson.read("$.birthdate", String.class);
 
-        Client[] body = listResponse.getBody();
-        if (body == null || body.length == 0) {
-            throw new IllegalStateException("No clients found for test setup");
-        }
+        assertThat(name).isEqualTo("Patched Name");
+        assertThat(email).isEqualTo("patched@example.com");
+        assertThat(phone).isEqualTo(originalPhone); // unchanged
+        assertThat(birthday).isEqualTo(originalBirhday); // unchanged
 
-        UUID id = body[0].getClientId();
-
-        Client updatedClient = new Client();
-        updatedClient.setName("Updated Name");
-        updatedClient.setEmail("updated@example.com");
-        updatedClient.setPhone("+41771111111");
-
-        HttpEntity<Client> request = new HttpEntity<>(updatedClient);
-
-        // This was to test PUT, replaced for requirements
-        // ResponseEntity<Void> response = rest.exchange(path + "/" + id,
-        // HttpMethod.PUT, request, Void.class);
-
-        ResponseEntity<Void> response = rest.exchange(path + "/" + id, HttpMethod.PATCH, request, Void.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        ResponseEntity<String> getResponse = rest.getForEntity(path + "/" + id, String.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        DocumentContext json = JsonPath.parse(getResponse.getBody());
-        String name = json.read("$.name");
-        String email = json.read("$.email");
-
-        assertThat(name).isEqualTo("Updated Name");
-        assertThat(email).isEqualTo("updated@example.com");
-
-        if (verbose) {
-            // log.info("PUT {}/{} → {}", path, id, name);
-            log.info("PACTH {}/{} → {}", path, id, name);
-        }
+        if (verbose)
+            log.info("PATCH {}/{} → {} (phone unchanged: {})", path, id, name, phone);
     }
 
     // DELETE /clients/{id}
@@ -181,4 +151,95 @@ class ClientControllerIntegrationTest {
             log.info("DELETE {}/{} → {}", path, id, isDeleted);
         }
     }
+
+    /*
+     * Since Client as an abstract class
+     * POST are on /clients/persons or /clients/companies
+     * instead on /clients
+     */
+
+    // // POST /clients
+    // @Test
+    // void shouldCreateANewClient() {
+    // Client newClient = new Client();
+    // newClient.setName("John Doe");
+    // newClient.setEmail("john.doe@example.com");
+    // newClient.setPhone("+41770000000");
+
+    // ResponseEntity<Void> createResponse = rest
+    // .postForEntity(path, newClient, Void.class);
+    // assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+    // URI locationOfNewClient = createResponse.getHeaders().getLocation();
+    // assertThat(locationOfNewClient).isNotNull();
+
+    // ResponseEntity<String> getResponse = rest.getForEntity(locationOfNewClient,
+    // String.class);
+    // assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    // DocumentContext json = JsonPath.parse(getResponse.getBody());
+    // String name = json.read("$.name");
+    // String email = json.read("$.email");
+    // String phone = json.read("$.phone");
+
+    // assertThat(name).isEqualTo("John Doe");
+    // assertThat(email).isEqualTo("john.doe@example.com");
+    // assertThat(phone).isEqualTo("+41770000000");
+
+    // if (verbose) {
+    // log.info("POST {} → {}", path, name);
+    // }
+    // }
+
+    /*
+     * PUT test was replaced by PATCH
+     * Due to partial update logic according requierements:
+     * We do not update birthdate or company_identifier
+     */
+
+    // // PUT /clients/{id}
+    // @Test
+    // void shouldUpdateAnExistingClient() {
+    // ResponseEntity<Client[]> listResponse = rest.getForEntity(path,
+    // Client[].class);
+
+    // Client[] body = listResponse.getBody();
+    // if (body == null || body.length == 0) {
+    // throw new IllegalStateException("No clients found for test setup");
+    // }
+
+    // UUID id = body[0].getClientId();
+
+    // Client updatedClient = new Client();
+    // updatedClient.setName("Updated Name");
+    // updatedClient.setEmail("updated@example.com");
+    // updatedClient.setPhone("+41771111111");
+
+    // HttpEntity<Client> request = new HttpEntity<>(updatedClient);
+
+    // // This was to test PUT, replaced for requirements
+    // // ResponseEntity<Void> response = rest.exchange(path + "/" + id,
+    // // HttpMethod.PUT, request, Void.class);
+
+    // ResponseEntity<Void> response = rest.exchange(path + "/" + id,
+    // HttpMethod.PATCH, request, Void.class);
+    // assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    // ResponseEntity<String> getResponse = rest.getForEntity(path + "/" + id,
+    // String.class);
+    // assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    // DocumentContext json = JsonPath.parse(getResponse.getBody());
+    // String name = json.read("$.name");
+    // String email = json.read("$.email");
+
+    // assertThat(name).isEqualTo("Updated Name");
+    // assertThat(email).isEqualTo("updated@example.com");
+
+    // if (verbose) {
+    // // log.info("PUT {}/{} → {}", path, id, name);
+    // log.info("PACTH {}/{} → {}", path, id, name);
+    // }
+    // }
+
 }

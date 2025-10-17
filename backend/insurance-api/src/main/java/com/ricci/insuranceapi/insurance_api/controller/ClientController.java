@@ -9,15 +9,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+// import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
-// TODO - Improve error codes instead 500, etc.
 
 @RestController
 @RequestMapping("/api/${api.version}/clients")
 public class ClientController {
+
+    // TODO - Improve error codes and validation with DTOs
 
     private final ClientService clientService;
 
@@ -54,28 +55,10 @@ public class ClientController {
         return ResponseEntity.ok(client); // 200 OK
     }
 
-    // POST /api/v_/clients
-    @PostMapping
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
-        Client created = clientService.createClient(client);
-        String apiVersion = System.getProperty("api.version", "v1");
-        URI location = URI.create("/api/" + apiVersion + "/clients/" + created.getClientId());
-        return ResponseEntity.created(location).body(created); // 201 Created
-    }
-
-    // // PUT /api/v_/clients/{id}
-    // @PutMapping("/{id}")
-    // public ResponseEntity<Client> updateClient(@PathVariable UUID id,
-    // @RequestBody Client updates) {
-    // Client updated = clientService.updateClient(id, updates); // 404 Not Found →
-    // ClientNotFoundAdvice
-    // return ResponseEntity.ok(updated); // 200 OK
-    // }
-
     // PATCH /api/v_/clients/{id}
     @PatchMapping("/{id}")
-    public ResponseEntity<Client> patchClient(@PathVariable UUID id, @RequestBody Client updates) {
-        Client updated = clientService.updateClient(id, updates); // 404 Not Found → ClientNotFoundAdvice
+    public ResponseEntity<Client> patchClient(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
+        Client updated = clientService.partialUpdate(id, updates); // 404 Not Found → ClientNotFoundAdvice
         return ResponseEntity.ok(updated); // 200 OK
     }
 
@@ -86,4 +69,35 @@ public class ClientController {
         // The Client is returned due to the soft delete strategy for archives
         return ResponseEntity.ok(deleted); // 200 OK
     }
+
+    /*
+     * Since Client as an abstract class
+     * POST are on /clients/persons or /clients/companies
+     * instead on /clients
+     */
+
+    // // POST /api/v_/clients
+    // @PostMapping
+    // public ResponseEntity<Client> createClient(@RequestBody Client client) {
+    // Client created = clientService.createClient(client);
+    // String apiVersion = System.getProperty("api.version", "v1");
+    // URI location = URI.create("/api/" + apiVersion + "/clients/" +
+    // created.getClientId());
+    // return ResponseEntity.created(location).body(created); // 201 Created
+    // }
+
+    /*
+     * PUT was replaced by PATCH
+     * Due to partial update logic according requierements:
+     * We do not update birthdate or company_identifier
+     */
+
+    // // PUT /api/v_/clients/{id}
+    // @PutMapping("/{id}")
+    // public ResponseEntity<Client> updateClient(@PathVariable UUID id,
+    // @RequestBody Client updates) {
+    // Client updated = clientService.updateClient(id, updates); // 404 Not Found →
+    // ClientNotFoundAdvice
+    // return ResponseEntity.ok(updated); // 200 OK
+    // }
 }

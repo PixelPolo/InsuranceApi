@@ -14,6 +14,6 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 public class Person extends Client {
 
-    @Column(nullable = false)
+    @Column()
     private LocalDate birthdate;
 }

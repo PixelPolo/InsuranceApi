@@ -25,6 +25,14 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/*
+ * This class performs integration tests on the PersonController.
+ * It verifies the correct behavior of REST endpoints
+ * and ensures the controller properly communicates with the service and repository layers.
+ * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * Inspired by Spring Academy materials.
+ */
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class PersonControllerIntegrationTest {

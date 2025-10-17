@@ -11,14 +11,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class CompanyService {
 
+    // TODO - Improve the service according requirements
+
     private final CompanyRepository companyRepository;
+    private final ClientService clientService;
 
     @Autowired
-    public CompanyService(CompanyRepository repository) {
-        this.companyRepository = repository;
+    public CompanyService(CompanyRepository companyRepository, ClientService clientService) {
+        this.companyRepository = companyRepository;
+        this.clientService = clientService;
     }
 
     public Company createCompany(Company company) {
+        clientService.validateCommonFields(company);
+
+        if (companyRepository.existsByCompanyIdentifier(company.getCompanyIdentifier())) {
+            throw new IllegalArgumentException("Company identifier already exists");
+        }
+
         return companyRepository.save(company);
     }
 

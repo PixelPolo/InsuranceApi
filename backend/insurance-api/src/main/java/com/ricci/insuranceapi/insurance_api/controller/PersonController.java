@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/${api.version}/clients/persons")
 public class PersonController {
 
+    // TODO - Improve error codes and validation with DTOs
+
     private final PersonService personService;
 
     @Autowired
