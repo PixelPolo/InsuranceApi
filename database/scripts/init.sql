@@ -9,8 +9,8 @@ CREATE TABLE
         "email" VARCHAR(128) UNIQUE,
         "name" VARCHAR(64),
         -- Soft deletion for archives
-        "is_deleted" BOOLEAN DEFAULT FALSE,
-        "deletion_date" DATE
+        "is_deleted" BOOLEAN NOT NULL DEFAULT FALSE,
+        "deletion_date" TIMESTAMP
     );
 
 -- Person is a specialization of a Client
@@ -39,6 +39,7 @@ CREATE TABLE
         ON UPDATE CASCADE
     );
 
+-- Contract
 CREATE TABLE
     public.contract (
         "contract_id" UUID DEFAULT gen_random_uuid () PRIMARY KEY,

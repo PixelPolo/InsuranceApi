@@ -1,5 +1,6 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
+import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
 import com.ricci.insuranceapi.insurance_api.model.Person;
 import com.ricci.insuranceapi.insurance_api.repository.PersonRepository;
 
@@ -22,7 +23,8 @@ public class PersonService {
         this.clientService = clientService;
     }
 
-    public Person createPerson(Person person) {
+    public Person createPerson(PersonDto dto) {
+        Person person = new Person(dto);
         clientService.validateCommonFields(person);
         return personRepository.save(person);
     }
@@ -32,4 +34,5 @@ public class PersonService {
     public Page<Person> getAllPersons(Pageable pageable) {
         return personRepository.findAll(pageable);
     }
+
 }

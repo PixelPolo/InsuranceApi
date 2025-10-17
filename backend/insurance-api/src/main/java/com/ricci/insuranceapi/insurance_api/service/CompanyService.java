@@ -1,5 +1,7 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
+import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
+import com.ricci.insuranceapi.insurance_api.exception.ClientInvalidDataException;
 import com.ricci.insuranceapi.insurance_api.model.Company;
 import com.ricci.insuranceapi.insurance_api.repository.CompanyRepository;
 
@@ -22,14 +24,17 @@ public class CompanyService {
         this.clientService = clientService;
     }
 
-    public Company createCompany(Company company) {
+    public Company createCompany(CompanyDto dto) {
+        Company company = new Company(dto);
+        checkUniqueId(company.getCompanyIdentifier());
         clientService.validateCommonFields(company);
-
-        if (companyRepository.existsByCompanyIdentifier(company.getCompanyIdentifier())) {
-            throw new IllegalArgumentException("Company identifier already exists");
-        }
-
         return companyRepository.save(company);
+    }
+
+    private void checkUniqueId(String id) {
+        if (companyRepository.existsByCompanyIdentifier(id)) {
+            throw new ClientInvalidDataException("Company identifier already exists");
+        }
     }
 
     // --- EXTRA ---
@@ -37,4 +42,5 @@ public class CompanyService {
     public Page<Company> getAllCompanies(Pageable pageable) {
         return companyRepository.findAll(pageable);
     }
+
 }

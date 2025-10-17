@@ -4,9 +4,20 @@
 
 package com.ricci.insuranceapi.insurance_api.model;
 
-import jakarta.persistence.*;
-import java.time.LocalDate;
 import java.util.UUID;
+
+import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.Table;
+import jakarta.persistence.InheritanceType;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -18,6 +29,15 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class Client {
+
+    protected Client(ClientDto dto) {
+        this.clientId = dto.getClientId();
+        this.phone = dto.getPhone();
+        this.email = dto.getEmail();
+        this.name = dto.getName();
+        this.isDeleted = dto.getIsDeleted() != null ? dto.getIsDeleted() : false;
+        this.deletionDate = dto.getDeletionDate();
+    }
 
     @Id
     @GeneratedValue
@@ -33,10 +53,10 @@ public abstract class Client {
     @Column(length = 64)
     private String name;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
     @Column(name = "deletion_date")
-    private LocalDate deletionDate;
+    private LocalDateTime deletionDate;
 
 }

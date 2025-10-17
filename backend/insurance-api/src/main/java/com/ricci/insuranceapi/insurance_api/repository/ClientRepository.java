@@ -2,11 +2,10 @@
 
 package com.ricci.insuranceapi.insurance_api.repository;
 
+import java.util.UUID;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, UUID> {
@@ -14,4 +13,5 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
     boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
+
 }

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
 import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Person;
@@ -32,12 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Inspired by Spring Academy materials.
  */
 
+// TODO - Refactor and improve tests
+
 @SpringBootTest
 @ActiveProfiles("test")
 class ClientServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(ClientServiceTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose"));
+    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
 
     @Autowired
     private ClientService clientService;
@@ -113,9 +117,9 @@ class ClientServiceTest {
 
         String oldPhone = existing.getPhone();
 
-        Map<String, Object> updates = Map.of(
-                "name", "Updated Name",
-                "email", "updated@example.com");
+        ClientPatchDto updates = new ClientPatchDto();
+        updates.setName("Updated Name");
+        updates.setEmail("updated@example.com");
 
         Client updated = clientService.partialUpdate(id, updates);
 
@@ -143,7 +147,8 @@ class ClientServiceTest {
         Client deleted = clientService.deleteClient(client.getClientId());
 
         assertThat(deleted.getIsDeleted()).isTrue();
-        assertThat(deleted.getDeletionDate()).isEqualTo(LocalDate.now());
+        LocalDate deletedDate = deleted.getDeletionDate().toLocalDate();
+        assertThat(deletedDate).isEqualTo(LocalDate.now());
 
         if (verbose) {
             log.info("Client soft deleted: {}", deleted);
@@ -164,59 +169,10 @@ class ClientServiceTest {
         Client secondDelete = clientService.deleteClient(client.getClientId());
 
         assertThat(secondDelete.getIsDeleted()).isTrue();
-        assertThat(secondDelete.getDeletionDate()).isEqualTo(firstDelete.getDeletionDate());
+        // Truncate to avoid precision error with nanoseconds
+        LocalDateTime firstDeleteDate = firstDelete.getDeletionDate().truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime seconDeleteDate = secondDelete.getDeletionDate().truncatedTo(ChronoUnit.SECONDS);
+        assertThat(firstDeleteDate).isEqualTo(seconDeleteDate);
     }
-
-    /*
-     * Since Client as an abstract class
-     * POST are on /clients/persons or /clients/companies
-     * instead on /clients
-     */
-
-    // // Create -> Insert New Client
-    // @Test
-    // void shouldCreateNewClient() {
-    // Client client = new Client();
-    // client.setName("John Doe");
-    // client.setEmail("john.doe@example.com");
-    // client.setPhone("+41770000000");
-
-    // clientService.createClient(client);
-
-    // Page<Client> all = clientService.getAllClients(PageRequest.of(0, 10));
-    // assertThat(all.getTotalElements()).isEqualTo(4);
-
-    // if (verbose) {
-    // log.info("New client created: {}", client);
-    // }
-    // }
-
-    /*
-     * PUT test was replaced by PATCH
-     * Due to partial update logic according requierements:
-     * We do not update birthdate or company_identifier
-     */
-
-    // // Update -> Update existing Client
-    // @Test
-    // void shouldUpdateClient() {
-    // Client existing = clientService.getAllClients(PageRequest.of(0, 1))
-    // .getContent()
-    // .get(0);
-
-    // Client updates = new Client();
-    // updates.setName("Updated Name");
-    // updates.setEmail("updated@example.com");
-    // updates.setPhone("+41771111111");
-
-    // Client updated = clientService.updateClient(existing.getClientId(), updates);
-
-    // assertThat(updated.getName()).isEqualTo("Updated Name");
-    // assertThat(updated.getEmail()).isEqualTo("updated@example.com");
-
-    // if (verbose) {
-    // log.info("Client updated: {}", updated);
-    // }
-    // }
 
 }

@@ -26,12 +26,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Inspired by Spring Academy materials.
  */
 
+// TODO - Refactor and improve tests
+
 @SpringBootTest
 @ActiveProfiles("test")
 public class ClientRepositoryTest {
 
     private static final Logger log = LoggerFactory.getLogger(ClientRepositoryTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose"));
+    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
 
     @Autowired
     private ClientRepository clientRepository;

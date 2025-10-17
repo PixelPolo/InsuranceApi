@@ -2,7 +2,7 @@ package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.ricci.insuranceapi.insurance_api.model.Person;
+import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
 
 import net.minidev.json.JSONArray;
 
@@ -33,6 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Inspired by Spring Academy materials.
  */
 
+// TODO - Refactor and improve tests
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class PersonControllerIntegrationTest {
@@ -40,7 +42,7 @@ class PersonControllerIntegrationTest {
     private static final String apiVersion = System.getProperty("api.version", "v1");
     private static final String path = "/api/" + apiVersion + "/clients/persons";
     private static final Logger log = LoggerFactory.getLogger(PersonControllerIntegrationTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose"));
+    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
 
     @Autowired
     private TestRestTemplate rest;
@@ -57,13 +59,13 @@ class PersonControllerIntegrationTest {
     // POST /clients/persons
     @Test
     void shouldCreateNewPerson() {
-        Person newPerson = new Person();
-        newPerson.setName("Charlie Dupuis");
-        newPerson.setEmail("charlie@example.com");
-        newPerson.setPhone("+41773334444");
-        newPerson.setBirthdate(LocalDate.of(1995, 3, 12));
+        PersonDto newPersonDto = new PersonDto();
+        newPersonDto.setName("Charlie Dupuis");
+        newPersonDto.setEmail("charlie@example.com");
+        newPersonDto.setPhone("+41773334444");
+        newPersonDto.setBirthdate(LocalDate.of(1995, 3, 12));
 
-        ResponseEntity<Void> createResponse = rest.postForEntity(path, newPerson, Void.class);
+        ResponseEntity<Void> createResponse = rest.postForEntity(path, newPersonDto, Void.class);
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI locationOfNewPerson = createResponse.getHeaders().getLocation();
@@ -107,4 +109,5 @@ class PersonControllerIntegrationTest {
             log.info("GET {} → {}", path, names);
         }
     }
+
 }

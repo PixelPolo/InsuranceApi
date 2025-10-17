@@ -2,7 +2,7 @@ package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.ricci.insuranceapi.insurance_api.model.Company;
+import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
 
 import net.minidev.json.JSONArray;
 
@@ -32,6 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Inspired by Spring Academy materials.
  */
 
+// TODO - Refactor and improve tests
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class CompanyControllerIntegrationTest {
@@ -39,7 +41,7 @@ class CompanyControllerIntegrationTest {
     private static final String apiVersion = System.getProperty("api.version", "v1");
     private static final String path = "/api/" + apiVersion + "/clients/companies";
     private static final Logger log = LoggerFactory.getLogger(CompanyControllerIntegrationTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose"));
+    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
 
     @Autowired
     private TestRestTemplate rest;
@@ -56,13 +58,14 @@ class CompanyControllerIntegrationTest {
     // POST /clients/companies
     @Test
     void shouldCreateNewCompany() {
-        Company newCompany = new Company();
-        newCompany.setName("Trinity Corp");
-        newCompany.setEmail("trinity@example.com");
-        newCompany.setPhone("+41772223333");
-        newCompany.setCompanyIdentifier("AAA-321");
+        CompanyDto newCompanyDto = new CompanyDto();
+        newCompanyDto.setName("Trinity Corp");
+        newCompanyDto.setEmail("trinity@example.com");
+        newCompanyDto.setPhone("+41772223333");
+        newCompanyDto.setCompanyIdentifier("AAA-321");
 
-        ResponseEntity<Void> createResponse = rest.postForEntity(path, newCompany, Void.class);
+        ResponseEntity<Void> createResponse = rest.postForEntity(path, newCompanyDto, Void.class);
+
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI locationOfNewCompany = createResponse.getHeaders().getLocation();
@@ -106,4 +109,5 @@ class CompanyControllerIntegrationTest {
             log.info("GET {} → {}", path, names);
         }
     }
+
 }
