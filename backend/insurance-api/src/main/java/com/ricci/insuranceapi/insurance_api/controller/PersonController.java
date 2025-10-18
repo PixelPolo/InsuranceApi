@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/${api.version}/clients/persons")
 public class PersonController {
 
-    // TODO - Improve error codes
-
     private final PersonService personService;
     private final PaginationUtils paginationUtils;
 

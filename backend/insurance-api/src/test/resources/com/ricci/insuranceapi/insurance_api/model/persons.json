@@ -1,0 +1,20 @@
+[
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440000",
+    "phone": "+41791234567",
+    "email": "alice@example.com",
+    "name": "Alice Dupont",
+    "birthdate": "1990-05-15",
+    "isDeleted": false,
+    "deletionDate": null
+  },
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440001",
+    "phone": "+41761239876",
+    "email": "bob@example.com",
+    "name": "Bob Martin",
+    "birthdate": "1988-09-22",
+    "isDeleted": false,
+    "deletionDate": null
+  }
+]

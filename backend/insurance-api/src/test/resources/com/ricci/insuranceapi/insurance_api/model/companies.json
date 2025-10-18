@@ -1,0 +1,20 @@
+[
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440002",
+    "phone": "+41442223344",
+    "email": "entreprise@example.com",
+    "name": "Entreprise SA",
+    "companyIdentifier": "ENT-001",
+    "isDeleted": false,
+    "deletionDate": null
+  },
+  {
+    "clientId": "550e8400-e29b-41d4-a716-446655440003",
+    "phone": "+41225557777",
+    "email": "techcorp@example.com",
+    "name": "TechCorp SARL",
+    "companyIdentifier": "ENT-002",
+    "isDeleted": false,
+    "deletionDate": null
+  }
+]

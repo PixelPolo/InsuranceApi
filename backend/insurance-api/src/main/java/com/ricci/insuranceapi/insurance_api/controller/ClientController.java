@@ -22,8 +22,6 @@ import java.util.UUID;
 @RequestMapping("/api/${api.version}/clients")
 public class ClientController {
 
-    // TODO - Improve error codes
-
     private final ClientService clientService;
     private final PaginationUtils paginationUtils;
 

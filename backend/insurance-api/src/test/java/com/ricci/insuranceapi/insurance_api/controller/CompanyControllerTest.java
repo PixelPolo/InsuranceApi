@@ -2,111 +2,137 @@ package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.ricci.insuranceapi.insurance_api.InsuranceApiApplicationTests;
 import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
 
 import net.minidev.json.JSONArray;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /*
  * This class performs integration tests on the CompanyController.
- * It verifies the correct behavior of REST endpoints
- * and ensures the controller properly communicates with the service and repository layers.
- * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
- * Inspired by Spring Academy materials.
+ * It verifies the correct behavior of REST endpoints and ensures 
+ * the controller properly communicates with the service and repository layers.
+ * Test data is loaded from InsuranceApiApplicationTests parent class.
+ * Inspired by Spring Academy materials
  */
-
-// TODO - Refactor and improve tests
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class CompanyControllerIntegrationTest {
+class CompanyControllerIntegrationTest extends InsuranceApiApplicationTests {
 
-    private static final String apiVersion = System.getProperty("api.version", "v1");
-    private static final String path = "/api/" + apiVersion + "/clients/companies";
-    private static final Logger log = LoggerFactory.getLogger(CompanyControllerIntegrationTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
+    private static final String PATH = BASE_PATH + "clients/companies";
 
     @Autowired
     private TestRestTemplate rest;
 
-    @Autowired
-    private JdbcTemplate jdbc;
-
-    @BeforeEach
-    void resetDatabase() throws IOException {
-        String sql = Files.readString(Paths.get("src/test/resources/db/migration/R__sample-test-data.sql"));
-        jdbc.execute(sql);
-    }
+    // -------------------------------
+    // --- POST /clients/companies ---
+    // -------------------------------
 
     // POST /clients/companies
     @Test
     void shouldCreateNewCompany() {
+        // Post a new company
         CompanyDto newCompanyDto = new CompanyDto();
         newCompanyDto.setName("Trinity Corp");
         newCompanyDto.setEmail("trinity@example.com");
         newCompanyDto.setPhone("+41772223333");
         newCompanyDto.setCompanyIdentifier("AAA-321");
+        ResponseEntity<Void> response = rest.postForEntity(PATH, newCompanyDto, Void.class);
 
-        ResponseEntity<Void> createResponse = rest.postForEntity(path, newCompanyDto, Void.class);
+        // Status
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        URI locationOfNewCompany = createResponse.getHeaders().getLocation();
+        // Location
+        URI locationOfNewCompany = response.getHeaders().getLocation();
         assertThat(locationOfNewCompany).isNotNull();
 
+        // Get the posted company
         ResponseEntity<String> getResponse = rest.getForEntity(locationOfNewCompany, String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        // Fields validation
         DocumentContext json = JsonPath.parse(getResponse.getBody());
         String name = json.read("$.name");
         String email = json.read("$.email");
         String phone = json.read("$.phone");
         String identifier = json.read("$.companyIdentifier");
-
         assertThat(name).isEqualTo("Trinity Corp");
         assertThat(email).isEqualTo("trinity@example.com");
         assertThat(phone).isEqualTo("+41772223333");
         assertThat(identifier).isEqualTo("AAA-321");
 
-        if (verbose) {
-            log.info("POST {} → {}", path, name);
+        if (VERBOSE) {
+            LOGGER.info("POST {} → {}", PATH, name);
         }
     }
 
+    // POST /clients/companies -> Error codes
+    @Test
+    void shouldNotCreateCompany() {
+        // Common setup
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Invalid email format
+        CompanyDto invalidEmailCompany = new CompanyDto();
+        invalidEmailCompany.setEmail("not-an-email");
+        ResponseEntity<String> response = rest.postForEntity(PATH, invalidEmailCompany, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // 400
+
+        // Invalid phone format
+        CompanyDto invalidPhoneCompany = new CompanyDto();
+        invalidPhoneCompany.setPhone("12345");
+        response = rest.postForEntity(PATH, invalidPhoneCompany, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // 400
+
+        // Unknown field
+        String badJson = "{\"unknownField\":\"oops\"}";
+        HttpEntity<String> badRequest = new HttpEntity<>(badJson, headers);
+        response = rest.exchange(PATH, HttpMethod.POST, badRequest, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // 400
+
+        // Wrong path
+        response = rest.postForEntity(PATH + "xxx", new CompanyDto(), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED); // 405
+
+        if (VERBOSE) {
+            LOGGER.info("POST {} → error codes tested", PATH);
+        }
+    }
+
+    // -------------
     // --- EXTRA ---
+    // -------------
 
     // GET /clients/companies
     @Test
     void shouldGetAllCompanies() {
-        ResponseEntity<String> response = rest.getForEntity(path, String.class);
+        // Get all companies
+        ResponseEntity<String> response = rest.getForEntity(PATH, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
         DocumentContext json = JsonPath.parse(response.getBody());
-        int count = json.read("$.length()");
-        assertThat(count).isEqualTo(1); // only Entreprise SA in sample data
 
+        // Length should be 1 from test data
+        int count = json.read("$.length()");
+        assertThat(count).isEqualTo(1);
+
+        // Names should be Entreprise SA
         JSONArray names = json.read("$..name");
         assertThat(names).contains("Entreprise SA");
 
-        if (verbose) {
-            log.info("GET {} → {}", path, names);
+        if (VERBOSE) {
+            LOGGER.info("GET {} → {}", PATH, names);
         }
     }
 

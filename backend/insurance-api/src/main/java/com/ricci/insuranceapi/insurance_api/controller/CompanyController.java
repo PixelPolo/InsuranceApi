@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/${api.version}/clients/companies")
 public class CompanyController {
 
-    // TODO - Improve error codes
-
     private final CompanyService companyService;
     private final PaginationUtils paginationUtils;
 
