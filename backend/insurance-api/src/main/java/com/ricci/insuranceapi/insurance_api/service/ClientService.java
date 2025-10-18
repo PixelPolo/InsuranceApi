@@ -37,12 +37,18 @@ public class ClientService {
     public Client partialUpdate(UUID id, ClientPatchDto updates) {
         Client existing = this.getClient(id);
 
+        // All fields could be patched, except
+        // clientId, birthdate or company_identifier
         if (updates.getName() != null)
             existing.setName(updates.getName());
         if (updates.getEmail() != null)
             existing.setEmail(updates.getEmail());
         if (updates.getPhone() != null)
             existing.setPhone(updates.getPhone());
+        if (updates.getIsDeleted() != null)
+            existing.setIsDeleted(updates.getIsDeleted());
+        if (updates.getDeletionDate() != null)
+            existing.setDeletionDate(updates.getDeletionDate());
 
         return clientRepository.save(existing);
     }
@@ -60,7 +66,7 @@ public class ClientService {
         }
     }
 
-    public void validateCommonFields(Client client) {
+    protected void validateCommonFields(Client client) {
         // Helper for POST on concrete childs class
         if (clientRepository.existsByPhone(client.getPhone())) {
             throw new ClientInvalidDataException("Phone already exists");
