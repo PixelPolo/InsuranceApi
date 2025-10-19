@@ -40,8 +40,6 @@ public class CompanyController {
         return ResponseEntity.created(location).body(new CompanyDto(created)); // 201 Created
     }
 
-    // --- EXTRA ---
-
     // GET /api/v_/clients/companies?page=0&size=5&sortBy=name&sortDir=asc
     @GetMapping
     public ResponseEntity<List<ClientDto>> getAllCompanies(

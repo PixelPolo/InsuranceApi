@@ -1,51 +1,26 @@
 package com.ricci.insuranceapi.insurance_api.repository;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.ricci.insuranceapi.insurance_api.InsuranceApiApplicationTests;
 import com.ricci.insuranceapi.insurance_api.model.Client;
+import com.ricci.insuranceapi.insurance_api.model.Company;
 import com.ricci.insuranceapi.insurance_api.model.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/*
- * This class tests the ClientRepository to verify the communication
- * between Spring Boot, Hibernate, and the PostgreSQL database.
- * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
- * Inspired by Spring Academy materials.
- */
-
-// TODO - Refactor and improve tests
-
 @SpringBootTest
 @ActiveProfiles("test")
-public class ClientRepositoryTest {
-
-    private static final Logger log = LoggerFactory.getLogger(ClientRepositoryTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
+public class ClientRepositoryTest extends InsuranceApiApplicationTests {
 
     @Autowired
     private ClientRepository clientRepository;
-
-    @Autowired
-    private JdbcTemplate jdbc;
-
-    @BeforeEach
-    void resetDatabase() throws IOException {
-        String sql = Files.readString(Paths.get("src/test/resources/db/migration/R__sample-test-data.sql"));
-        jdbc.execute(sql);
-    }
 
     // Read -> Find All Clients
     @Test
@@ -54,8 +29,8 @@ public class ClientRepositoryTest {
 
         assertThat(clients).isNotNull().hasSize(3);
 
-        if (verbose) {
-            log.info("Clients found: {}", clients);
+        if (VERBOSE) {
+            LOGGER.info("Clients found: {}", clients);
         }
     }
 
@@ -68,27 +43,68 @@ public class ClientRepositoryTest {
         assertThat(found).isNotNull();
         assertThat(found.getEmail()).isEqualTo(first.getEmail());
 
-        if (verbose) {
-            log.info("Found client by ID: {}", found);
+        if (VERBOSE) {
+            LOGGER.info("Found client by ID: {}", found);
         }
     }
 
-    // Create -> Insert New Client
-    // Test adapted since Client as an abstract class
+    // Create -> Insert New Person (Client's child)
     @Test
-    void shouldCreateNewClient() {
-        Client client = new Person();
-        client.setName("John Doe");
-        client.setEmail("john.doe@example.com");
-        client.setPhone("+41770000000");
+    void shouldCreateNewPerson() {
+        String name = "John Doe";
+        String email = "john.doe@example.com";
+        String phone = "+41770000000";
+        LocalDate birthdate = LocalDate.of(1995, 3, 12);
 
-        clientRepository.save(client);
+        Person client = new Person();
+        client.setName(name);
+        client.setEmail(email);
+        client.setPhone(phone);
+        client.setBirthdate(birthdate);
+
+        Person created = clientRepository.save(client);
 
         List<Client> all = clientRepository.findAll();
         assertThat(all).hasSize(4);
 
-        if (verbose) {
-            log.info("New client created: {}", client);
+        assertThat(created).isNotNull();
+        assertThat(created.getName()).isEqualTo(name);
+        assertThat(created.getEmail()).isEqualTo(email);
+        assertThat(created.getPhone()).isEqualTo(phone);
+        assertThat(created.getBirthdate()).isEqualTo(birthdate);
+
+        if (VERBOSE) {
+            LOGGER.info("New client created: {}", created);
+        }
+    }
+
+    // Create -> Insert New Company
+    @Test
+    void shouldCreateNewCompany() {
+        String name = "ACME Corp";
+        String email = "contact@acme.com";
+        String phone = "+41771112233";
+        String companyId = "CHE-123.456.789";
+
+        Company company = new Company();
+        company.setName(name);
+        company.setEmail(email);
+        company.setPhone(phone);
+        company.setCompanyIdentifier(companyId);
+
+        Company created = clientRepository.save(company);
+
+        List<Client> all = clientRepository.findAll();
+        assertThat(all).hasSize(4);
+
+        assertThat(created).isNotNull();
+        assertThat(created.getName()).isEqualTo(name);
+        assertThat(created.getEmail()).isEqualTo(email);
+        assertThat(created.getPhone()).isEqualTo(phone);
+        assertThat(created.getCompanyIdentifier()).isEqualTo(companyId);
+
+        if (VERBOSE) {
+            LOGGER.info("New company created: {}", created);
         }
     }
 
@@ -102,8 +118,8 @@ public class ClientRepositoryTest {
         Client updated = clientRepository.findById(client.getClientId()).orElseThrow();
         assertThat(updated.getIsDeleted()).isTrue();
 
-        if (verbose) {
-            log.info("Client soft deleted: {}", updated);
+        if (VERBOSE) {
+            LOGGER.info("Client soft deleted: {}", updated);
         }
     }
 

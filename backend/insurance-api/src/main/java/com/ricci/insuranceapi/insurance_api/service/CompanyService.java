@@ -37,8 +37,6 @@ public class CompanyService {
         }
     }
 
-    // --- EXTRA ---
-
     public Page<Company> getAllCompanies(Pageable pageable) {
         return companyRepository.findAll(pageable);
     }

@@ -111,9 +111,9 @@ class CompanyControllerIntegrationTest extends InsuranceApiApplicationTests {
         }
     }
 
-    // -------------
-    // --- EXTRA ---
-    // -------------
+    // ------------------------------
+    // --- GET /clients/companies ---
+    // ------------------------------
 
     // GET /clients/companies
     @Test

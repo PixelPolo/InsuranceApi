@@ -36,9 +36,9 @@ class PersonControllerIntegrationTest extends InsuranceApiApplicationTests {
     @Autowired
     private TestRestTemplate rest;
 
-    // -------------------------------
+    // -----------------------------
     // --- POST /clients/persons ---
-    // -------------------------------
+    // -----------------------------
 
     // POST /clients/persons
     @Test
@@ -112,9 +112,9 @@ class PersonControllerIntegrationTest extends InsuranceApiApplicationTests {
         }
     }
 
-    // -------------
-    // --- EXTRA ---
-    // -------------
+    // ----------------------------
+    // --- GET /clients/persons ---
+    // ----------------------------
 
     // GET /clients/persons
     @Test

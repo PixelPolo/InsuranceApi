@@ -52,21 +52,21 @@ public class ClientController {
     // GET /api/v_/clients/{id}
     @GetMapping("/{id}")
     public ResponseEntity<ClientDto> getClient(@PathVariable UUID id) {
-        Client client = clientService.getClient(id); // 404 Not Found → ClientNotFoundAdvice
+        Client client = clientService.getClient(id); // 404 Not Found → GlobalExceptionHandler
         return ResponseEntity.ok(ClientDtoFactory.fromClient(client)); // 200 OK
     }
 
     // PATCH /api/v_/clients/{id}
     @PatchMapping("/{id}")
     public ResponseEntity<ClientDto> patchClient(@PathVariable UUID id, @Valid @RequestBody ClientPatchDto updates) {
-        Client updated = clientService.partialUpdate(id, updates); // 404 Not Found → ClientNotFoundAdvice
+        Client updated = clientService.partialUpdate(id, updates); // 404 Not Found → GlobalExceptionHandler
         return ResponseEntity.ok(ClientDtoFactory.fromClient(updated)); // 200 OK
     }
 
     // DELETE /api/v_/clients/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<ClientDto> deleteClient(@PathVariable UUID id) {
-        Client deleted = clientService.deleteClient(id); // 404 Not Found → ClientNotFoundAdvice
+        Client deleted = clientService.deleteClient(id); // 404 Not Found → GlobalExceptionHandler
         return ResponseEntity.ok(ClientDtoFactory.fromClient(deleted)); // 200 OK with client (soft delete)
     }
 }

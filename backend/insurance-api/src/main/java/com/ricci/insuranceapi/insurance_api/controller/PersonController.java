@@ -40,8 +40,6 @@ public class PersonController {
         return ResponseEntity.created(location).body(new PersonDto(created)); // 201 Created
     }
 
-    // --- EXTRA ---
-
     // GET /api/v_/clients/persons?page=0&size=5&sortBy=name&sortDir=asc
     @GetMapping
     public ResponseEntity<List<ClientDto>> getAllPersons(

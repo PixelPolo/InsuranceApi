@@ -29,8 +29,6 @@ public class PersonService {
         return personRepository.save(person);
     }
 
-    // --- EXTRA ---
-
     public Page<Person> getAllPersons(Pageable pageable) {
         return personRepository.findAll(pageable);
     }
