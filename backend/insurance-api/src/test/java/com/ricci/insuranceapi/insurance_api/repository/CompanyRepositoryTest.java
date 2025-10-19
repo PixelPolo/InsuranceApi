@@ -24,6 +24,10 @@ public class CompanyRepositoryTest extends InsuranceApiApplicationTests {
 
     // Create -> Tested in ClientRepositoryTest
 
+    // --------------------
+    // --- Read Clients ---
+    // --------------------
+
     // Read -> Find All Company
     @Test
     void shouldFindAllCompanies() {

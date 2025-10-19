@@ -1,102 +1,79 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.ricci.insuranceapi.insurance_api.InsuranceApiApplicationTests;
 import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
+import com.ricci.insuranceapi.insurance_api.exception.ClientInvalidDataException;
 import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Person;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /*
- * This class tests the ClientService layer to verify the business logic
- * interacting with the ClientRepository and database.
- * Test data is loaded from: backend/insurance-api/src/test/resources/db/migration/R__sample-test-data.sql
+ * This class performs integration tests on the ClientService.
+ * It verifies the business logic interacting with the repository layer 
+ * and ensures data consistency through real database operations.
+ * Test data is loaded from the InsuranceApiApplicationTests parent class.
  * Inspired by Spring Academy materials.
  */
 
-// TODO - Refactor and improve tests
-
 @SpringBootTest
 @ActiveProfiles("test")
-class ClientServiceTest {
-
-    private static final Logger log = LoggerFactory.getLogger(ClientServiceTest.class);
-    private static final boolean verbose = "true".equalsIgnoreCase(System.getProperty("test.verbose", "true"));
+class ClientServiceTest extends InsuranceApiApplicationTests {
 
     @Autowired
     private ClientService clientService;
 
-    @Autowired
-    private JdbcTemplate jdbc;
+    private PageRequest fullPageRequest = PageRequest.of(0, 10);
+    private PageRequest firstPageSizeOne = PageRequest.of(0, 1);
 
-    @BeforeEach
-    void resetDatabase() throws IOException {
-        String sql = Files.readString(Paths.get("src/test/resources/db/migration/R__sample-test-data.sql"));
-        jdbc.execute(sql);
-    }
+    // --------------------
+    // --- Read clients ---
+    // --------------------
 
     // Read -> Find All Clients
     @Test
     void shouldFindAllClients() {
-        Page<Client> clients = clientService.getAllClients(PageRequest.of(0, 10));
+        Page<Client> clients = clientService.getAllClients(fullPageRequest);
 
         assertThat(clients.getContent()).isNotNull().hasSize(3);
 
-        if (verbose) {
-            log.info("Clients found: {}", clients.getContent());
+        if (VERBOSE) {
+            LOGGER.info("Clients found: {}", clients.getContent());
         }
     }
 
     // Read -> Find By ID
     @Test
     void shouldFindClientById() {
-        Client first = clientService.getAllClients(
-                PageRequest.of(0, 1))
-                .getContent().get(0);
+        Client first = clientService.getAllClients(fullPageRequest).getContent().get(0);
         Client found = clientService.getClient(first.getClientId());
 
         assertThat(found).isNotNull();
         assertThat(found.getEmail()).isEqualTo(first.getEmail());
 
-        if (verbose) {
-            log.info("Found client by ID: {}", found);
+        if (VERBOSE) {
+            LOGGER.info("Found client by ID: {}", found);
         }
-    }
-
-    // Read -> Should throw if client not found
-    @Test
-    void shouldThrowWhenClientNotFound() {
-        UUID fakeId = UUID.randomUUID();
-
-        assertThrows(ClientNotFoundException.class, () -> {
-            clientService.getClient(fakeId);
-        });
     }
 
     // Read -> Pagination
     @Test
-    void shouldReturnSingleClientWithPagination() {
-        Page<Client> page = clientService.getAllClients(PageRequest.of(0, 1));
+    void shouldfirstClientWithPagination() {
+        Page<Client> page = clientService.getAllClients(firstPageSizeOne);
 
         assertThat(page.getContent()).hasSize(1);
         assertThat(page.getTotalElements()).isEqualTo(3);
@@ -104,75 +81,114 @@ class ClientServiceTest {
         Client first = page.getContent().get(0);
         assertThat(first).isNotNull();
 
-        if (verbose) {
-            log.info("Page 0 (size 1) returned client: {}", first);
+        if (VERBOSE) {
+            LOGGER.info("Page 0 size 1 returned client: {}", first);
         }
     }
+
+    // ----------------------
+    // --- Update clients ---
+    // ----------------------
 
     // Partial update
     @Test
     void shouldPartiallyUpdateClient() {
-        Client existing = clientService.getAllClients(PageRequest.of(0, 1)).getContent().get(0);
-        UUID id = existing.getClientId();
-
-        String oldPhone = existing.getPhone();
-
         ClientPatchDto updates = new ClientPatchDto();
         updates.setName("Updated Name");
         updates.setEmail("updated@example.com");
 
-        Client updated = clientService.partialUpdate(id, updates);
+        Client firstClient = clientService.getAllClients(fullPageRequest).getContent().get(0);
+        Client firstClientUpdated = clientService.partialUpdate(firstClient.getClientId(), updates);
 
-        // Cast to Person to check birthdate
-        Person updatedPerson = (Person) updated;
-        Person existingPerson = (Person) existing;
+        assertThat(firstClientUpdated.getName()).isEqualTo("Updated Name");
+        assertThat(firstClientUpdated.getEmail()).isEqualTo("updated@example.com");
+        assertThat(firstClientUpdated.getPhone()).isEqualTo(firstClient.getPhone()); // unchanged
 
-        assertThat(updatedPerson.getName()).isEqualTo("Updated Name");
-        assertThat(updatedPerson.getEmail()).isEqualTo("updated@example.com");
-        assertThat(updatedPerson.getPhone()).isEqualTo(oldPhone); // unchanged
-        assertThat(updatedPerson.getBirthdate()).isEqualTo(existingPerson.getBirthdate()); // unchanged
+        // Need a cast to Person to check the birthdate specific field
+        if (firstClientUpdated instanceof Person person && firstClient instanceof Person original) {
+            assertThat(person.getBirthdate()).isEqualTo(original.getBirthdate()); // unchanged
+        }
 
-        if (verbose) {
-            log.info("Client partially updated: {}", updated);
+        if (VERBOSE) {
+            LOGGER.info("Client partially updated: {}", firstClientUpdated);
         }
     }
+
+    // ----------------------
+    // --- Delete clients ---
+    // ----------------------
 
     // Delete -> Soft Delete Client
     @Test
     void shouldSoftDeleteClient() {
-        Client client = clientService.getAllClients(PageRequest.of(0, 1))
-                .getContent()
-                .get(0);
+        Client firstClient = clientService.getAllClients(fullPageRequest).getContent().get(0);
+        Client deleted = clientService.deleteClient(firstClient.getClientId());
 
-        Client deleted = clientService.deleteClient(client.getClientId());
-
+        LocalDate deletionDate = deleted.getDeletionDate().toLocalDate();
+        assertThat(deletionDate).isEqualTo(LocalDate.now());
         assertThat(deleted.getIsDeleted()).isTrue();
-        LocalDate deletedDate = deleted.getDeletionDate().toLocalDate();
-        assertThat(deletedDate).isEqualTo(LocalDate.now());
 
-        if (verbose) {
-            log.info("Client soft deleted: {}", deleted);
+        if (VERBOSE) {
+            LOGGER.info("Client soft deleted: {}", deleted);
         }
     }
 
     // Delete -> Already Deleted
     @Test
     void shouldNotReDeleteAlreadyDeletedClient() {
-        Client client = clientService.getAllClients(PageRequest.of(0, 1))
-                .getContent()
-                .get(0);
-
         // First deletion
-        Client firstDelete = clientService.deleteClient(client.getClientId());
+        Client firstClient = clientService.getAllClients(fullPageRequest).getContent().get(0);
+        Client firstDeleted = clientService.deleteClient(firstClient.getClientId());
+        assertThat(firstDeleted.getIsDeleted()).isTrue();
 
         // Second deletion should not change anything
-        Client secondDelete = clientService.deleteClient(client.getClientId());
+        Client secondDeleted = clientService.deleteClient(firstClient.getClientId());
+        assertThat(secondDeleted.getIsDeleted()).isTrue();
 
-        assertThat(secondDelete.getIsDeleted()).isTrue();
-        // Truncate to avoid precision error with nanoseconds
-        LocalDateTime firstDeleteDate = firstDelete.getDeletionDate().truncatedTo(ChronoUnit.SECONDS);
-        LocalDateTime seconDeleteDate = secondDelete.getDeletionDate().truncatedTo(ChronoUnit.SECONDS);
-        assertThat(firstDeleteDate).isEqualTo(seconDeleteDate);
+        LocalDateTime firstDeletionDate = firstDeleted.getDeletionDate();
+        LocalDateTime seconDeletionDate = secondDeleted.getDeletionDate();
+        assertThat(ChronoUnit.SECONDS.between(firstDeletionDate, seconDeletionDate)).isLessThan(2);
+    }
+
+    // ------------------
+    // --- Exceptions ---
+    // ------------------
+
+    // Read, Patch, Delete -> ClientNotFoundException
+    @Test
+    void shouldThrowClientNotFoundException() {
+        UUID fakeId = UUID.randomUUID();
+
+        // Read
+        assertThrows(ClientNotFoundException.class, () -> {
+            clientService.getClient(fakeId);
+        });
+
+        // Patch
+        ClientPatchDto updates = new ClientPatchDto();
+        assertThrows(ClientNotFoundException.class, () -> {
+            clientService.partialUpdate(fakeId, updates);
+        });
+
+        // Delete
+        assertThrows(ClientNotFoundException.class, () -> {
+            clientService.deleteClient(fakeId);
+        });
+    }
+
+    // Validate fields -> ClientInvalidDataException (unique email and phone)
+    @Test
+    void shouldContainUniqueEmailAndPhone() {
+        Client firstClient = clientService.getAllClients(fullPageRequest).getContent().get(0);
+        // Since Client class is abstract, need a concrete child
+        if (firstClient instanceof Person original) {
+            Person duplicate = new Person();
+            duplicate.setEmail(original.getEmail());
+            duplicate.setPhone(firstClient.getPhone());
+            assertThrows(ClientInvalidDataException.class, () -> {
+                clientService.validateUniquePhoneOrEmail(duplicate);
+            });
+        }
     }
 
 }

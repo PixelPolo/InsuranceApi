@@ -23,14 +23,14 @@ public class PersonService {
         this.clientService = clientService;
     }
 
-    public Person createPerson(PersonDto dto) {
-        Person person = new Person(dto);
-        clientService.validateCommonFields(person);
-        return personRepository.save(person);
-    }
-
     public Page<Person> getAllPersons(Pageable pageable) {
         return personRepository.findAll(pageable);
+    }
+
+    public Person createPerson(PersonDto dto) {
+        Person person = new Person(dto);
+        clientService.validateUniquePhoneOrEmail(person);
+        return personRepository.save(person);
     }
 
 }

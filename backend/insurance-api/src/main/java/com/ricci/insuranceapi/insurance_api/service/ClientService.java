@@ -66,7 +66,7 @@ public class ClientService {
         }
     }
 
-    protected void validateCommonFields(Client client) {
+    protected void validateUniquePhoneOrEmail(Client client) {
         // Helper for POST on concrete childs class
         if (clientRepository.existsByPhone(client.getPhone())) {
             throw new ClientInvalidDataException("Phone already exists");

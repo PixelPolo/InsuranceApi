@@ -24,21 +24,21 @@ public class CompanyService {
         this.clientService = clientService;
     }
 
+    public Page<Company> getAllCompanies(Pageable pageable) {
+        return companyRepository.findAll(pageable);
+    }
+
     public Company createCompany(CompanyDto dto) {
         Company company = new Company(dto);
-        checkUniqueId(company.getCompanyIdentifier());
-        clientService.validateCommonFields(company);
+        checkUniqueCompanyIdentifier(company.getCompanyIdentifier());
+        clientService.validateUniquePhoneOrEmail(company);
         return companyRepository.save(company);
     }
 
-    private void checkUniqueId(String id) {
+    private void checkUniqueCompanyIdentifier(String id) {
         if (companyRepository.existsByCompanyIdentifier(id)) {
             throw new ClientInvalidDataException("Company identifier already exists");
         }
-    }
-
-    public Page<Company> getAllCompanies(Pageable pageable) {
-        return companyRepository.findAll(pageable);
     }
 
 }

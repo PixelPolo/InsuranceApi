@@ -1,8 +1,8 @@
 package com.ricci.insuranceapi.insurance_api.model;
 
-import java.time.LocalDate;
-
 import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
+
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -28,6 +28,10 @@ public class PersonRepositoryTest extends InsuranceApiApplicationTests {
 
     // Create -> Tested in ClientRepositoryTest
 
+    // --------------------
+    // --- Read Clients ---
+    // --------------------
+
     // Read -> Find All Persons
     @Test
     void shouldFindAllPersons() {

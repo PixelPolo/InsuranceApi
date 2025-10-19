@@ -18,9 +18,11 @@ public class PaginationUtils {
 
     private Sort buildSort(String sortBy, String sortDir) {
         // If weird values like "desccc" -> fallback to "asc"
-        return "desc".equalsIgnoreCase(sortDir)
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        if ("desc".equalsIgnoreCase(sortDir)) {
+            return Sort.by(sortBy).descending();
+        } else {
+            return Sort.by(sortBy).ascending();
+        }
     }
 
 }

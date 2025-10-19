@@ -4,10 +4,9 @@
 
 package com.ricci.insuranceapi.insurance_api.model;
 
-import java.util.UUID;
-
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
 
+import java.util.UUID;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;

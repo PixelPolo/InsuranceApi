@@ -22,6 +22,10 @@ public class ClientRepositoryTest extends InsuranceApiApplicationTests {
     @Autowired
     private ClientRepository clientRepository;
 
+    // --------------------
+    // --- Read Clients ---
+    // --------------------
+
     // Read -> Find All Clients
     @Test
     void shouldFindAllClients() {
@@ -47,6 +51,10 @@ public class ClientRepositoryTest extends InsuranceApiApplicationTests {
             LOGGER.info("Found client by ID: {}", found);
         }
     }
+
+    // --------------------------------------------
+    // --- Create Client (concrete child class) ---
+    // --------------------------------------------
 
     // Create -> Insert New Person (Client's child)
     @Test
@@ -107,6 +115,10 @@ public class ClientRepositoryTest extends InsuranceApiApplicationTests {
             LOGGER.info("New company created: {}", created);
         }
     }
+
+    // ---------------------
+    // --- Delete Client ---
+    // ---------------------
 
     // Delete -> Soft Delete Client
     @Test
