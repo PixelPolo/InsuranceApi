@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,7 +147,7 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // 400
     }
 
-    // GET /clients -> sorting ASC
+    // GET /clients -> sorting name ASC
     @Test
     void shouldSortWhenPagination() {
         // Get with pagination
@@ -166,7 +167,7 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
         assertThat(second.compareToIgnoreCase(third)).isLessThanOrEqualTo(0);
     }
 
-    // GET /clients -> sorting DESC
+    // GET /clients -> sorting name DESC
     @Test
     void shouldSortDescendingWhenPagination() {
         // Get with sorting DESC
@@ -298,6 +299,7 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
     void shouldSoftDeleteClient() {
         // Delete first client
         String firstClientId = getFirstClientId();
+        LocalDateTime now = LocalDateTime.now();
         rest.delete(PATH + "/" + firstClientId);
 
         // Get the first client deleted (soft delete for archives)
@@ -311,7 +313,6 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
         String deletedDateStr = deletedClient.read("$.deletionDate");
         assertThat(deletedDateStr).isNotNull();
         LocalDateTime deletionDate = LocalDateTime.parse(deletedDateStr);
-        LocalDateTime now = LocalDateTime.now();
         assertThat(isSameLocalDateTime(deletionDate, now)).isTrue();
 
         if (VERBOSE) {
@@ -330,6 +331,115 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
         // Wrong path
         response = rest.exchange(PATH + "/xxx", HttpMethod.DELETE, null, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // 400
+    }
+
+    // ------------------------------------------
+    // --- GET /clients/{id}/contracts/active ---
+    // ------------------------------------------
+
+    @Test
+    void shouldGetActiveContractsForClient() {
+        String firstClientId = getFirstClientId();
+
+        ResponseEntity<String> response = rest.getForEntity(
+                PATH + "/" + firstClientId + "/contracts/active", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        DocumentContext json = JsonPath.parse(response.getBody());
+        JSONArray costs = json.read("$..costAmount");
+
+        assertThat(costs).hasSize(1);
+        assertThat(new BigDecimal(costs.get(0).toString())).isEqualByComparingTo("400");
+
+        if (VERBOSE) {
+            LOGGER.info("Active contracts for client {} → {}", firstClientId, costs);
+        }
+    }
+
+    // GET /clients/{id}/contracts/active -> wrong UUID
+    @Test
+    void shouldNotGetActiveContractsForWrongClient() {
+        String fakeId = "00000000-0000-0000-0000-000000000000";
+        ResponseEntity<String> resp = rest.getForEntity(PATH + "/" + fakeId + "/contracts/active", String.class);
+        assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT); // 204
+    }
+
+    // ------------------------------------------------------------------
+    // --- GET /clients/{id}/contracts/after?date=2023-01-01T00:00:00 ---
+    // ------------------------------------------------------------------
+
+    // Get active contracts for a client after a given update date
+    @Test
+    void shouldGetContractsUpdatedAfterGivenDate() {
+        String firstClientId = getFirstClientId();
+
+        String date = "2023-01-01T00:00:00";
+        ResponseEntity<String> response = rest.getForEntity(
+                PATH + "/" + firstClientId + "/contracts/after?date=" + date, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        DocumentContext json = JsonPath.parse(response.getBody());
+        JSONArray clientIds = json.read("$..clientId");
+
+        assertThat(clientIds).isNotEmpty();
+        assertThat(clientIds.get(0)).isEqualTo(firstClientId);
+
+        if (VERBOSE) {
+            LOGGER.info("Contracts updated after {} → {}", date, clientIds);
+        }
+    }
+
+    // Get no active contracts for a client after a given update date
+    @Test
+    void shouldNotGetContractsUpdatedAfterFutureDate() {
+        String firstClientId = getFirstClientId();
+        String futureDate = LocalDateTime.now().plusYears(10).toString();
+
+        ResponseEntity<String> response = rest.getForEntity(
+                PATH + "/" + firstClientId + "/contracts/after?date=" + futureDate, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT); // 204
+    }
+
+    // GET /clients/{id}/contracts/after -> bad date format
+    @Test
+    void shouldRejectContractsUpdatedAfterWithBadDate() {
+        String id = getFirstClientId();
+        ResponseEntity<String> resp = rest.getForEntity(
+                PATH + "/" + id + "/contracts/after?date=bad-date", String.class);
+        assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // 400
+    }
+
+    // -------------------------------------------
+    // --- GET /clients/{id}/contracts/costsum ---
+    // -------------------------------------------
+
+    @Test
+    void shouldGetContractsSummary() {
+        String firstClientId = getFirstClientId();
+
+        ResponseEntity<String> response = rest.getForEntity(
+                PATH + "/" + firstClientId + "/contracts/costsum", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        BigDecimal sum = new BigDecimal(response.getBody());
+        assertThat(sum).isGreaterThan(BigDecimal.ZERO);
+        assertThat(sum).isEqualByComparingTo(new BigDecimal("400"));
+
+        if (VERBOSE) {
+            LOGGER.info("Contracts sum for first client → {}", sum);
+        }
+    }
+
+    // GET /clients/{id}/contracts/costsum -> wrong UUID
+    @Test
+    void shouldNotGetContractsSummaryForWrongClient() {
+        String fakeId = "00000000-0000-0000-0000-000000000000";
+        ResponseEntity<String> resp = rest.getForEntity(PATH + "/" + fakeId + "/contracts/costsum", String.class);
+        assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(new BigDecimal(resp.getBody())).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
 }

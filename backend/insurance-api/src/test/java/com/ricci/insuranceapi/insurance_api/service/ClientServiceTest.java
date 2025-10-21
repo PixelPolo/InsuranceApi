@@ -128,6 +128,8 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
     // --- Delete clients ---
     // ----------------------
 
+    // TODO - Sometimes passes, other times not
+
     // Delete -> Soft Delete Client
     @Test
     void shouldSoftDeleteClient() {
@@ -178,9 +180,9 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
         });
 
         // Patch
-        ClientPatchDto updates = new ClientPatchDto();
+        ClientPatchDto update = new ClientPatchDto();
         assertThrows(ClientNotFoundException.class, () -> {
-            clientService.partialUpdate(fakeId, updates);
+            clientService.partialUpdate(fakeId, update);
         });
 
         // Delete

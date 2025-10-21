@@ -1,6 +1,7 @@
 package com.ricci.insuranceapi.insurance_api.mapper;
 
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
+import com.ricci.insuranceapi.insurance_api.dto.ContractPatchDto;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
 
@@ -32,6 +33,14 @@ public class ContractMapper {
         contractDto.setEndDate(contractEntity.getEndDate());
         contractDto.setCostAmount(contractEntity.getCostAmount());
         return contractDto;
+    }
+
+    // ContractPatchDto -> Contract
+    public Contract toEntityFromUpdate(ContractPatchDto contractDto) {
+        Contract contract = new Contract();
+        contract.setEndDate(contractDto.getEndDate());
+        contract.setCostAmount(contractDto.getCostAmount());
+        return contract;
     }
 
     // List ContractDto

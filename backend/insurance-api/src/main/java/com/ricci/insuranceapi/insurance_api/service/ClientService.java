@@ -43,21 +43,21 @@ public class ClientService {
     // --- Update clients ---
     // ----------------------
 
-    public Client partialUpdate(UUID id, ClientPatchDto updates) {
+    public Client partialUpdate(UUID id, ClientPatchDto update) {
         Client existing = this.getClient(id);
 
         // All fields could be patched, except
         // clientId, birthdate or company_identifier
-        if (updates.getName() != null)
-            existing.setName(updates.getName());
-        if (updates.getEmail() != null)
-            existing.setEmail(updates.getEmail());
-        if (updates.getPhone() != null)
-            existing.setPhone(updates.getPhone());
-        if (updates.getIsDeleted() != null)
-            existing.setIsDeleted(updates.getIsDeleted());
-        if (updates.getDeletionDate() != null)
-            existing.setDeletionDate(updates.getDeletionDate());
+        if (update.getName() != null)
+            existing.setName(update.getName());
+        if (update.getEmail() != null)
+            existing.setEmail(update.getEmail());
+        if (update.getPhone() != null)
+            existing.setPhone(update.getPhone());
+        if (update.getIsDeleted() != null)
+            existing.setIsDeleted(update.getIsDeleted());
+        if (update.getDeletionDate() != null)
+            existing.setDeletionDate(update.getDeletionDate());
 
         return clientRepository.save(existing);
     }

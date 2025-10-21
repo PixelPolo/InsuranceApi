@@ -3,7 +3,6 @@ package com.ricci.insuranceapi.insurance_api.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
+import com.ricci.insuranceapi.insurance_api.dto.ContractPatchDto;
 import com.ricci.insuranceapi.insurance_api.exception.ContractNotFoundException;
+import com.ricci.insuranceapi.insurance_api.mapper.ContractMapper;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
 import com.ricci.insuranceapi.insurance_api.repository.ClientRepository;
@@ -22,12 +23,15 @@ import com.ricci.insuranceapi.insurance_api.repository.ContractRepository;
 public class ContractService {
 
     private final ContractRepository contractRepository;
-    private final ClientRepository clientRepository;
+    private final ContractMapper contractMapper;
 
     @Autowired
-    public ContractService(ContractRepository contractRepository, ClientRepository clientRepository) {
+    public ContractService(
+            ContractRepository contractRepository,
+            ClientRepository clientRepository,
+            ContractMapper contractMapper) {
         this.contractRepository = contractRepository;
-        this.clientRepository = clientRepository;
+        this.contractMapper = contractMapper;
     }
 
     // ----------------------
@@ -43,24 +47,26 @@ public class ContractService {
     }
 
     // ------------------------
+    // --- Create contracts ---
+    // ------------------------
+
+    public Contract createContract(ContractDto dto, Client client) {
+        Contract contract = contractMapper.toEntity(dto, client);
+        return contractRepository.save(contract);
+    }
+
+    // ------------------------
     // --- Update contracts ---
     // ------------------------
 
-    public Contract partialUpdate(UUID id, ContractDto update) {
+    public Contract partialUpdate(UUID id, ContractPatchDto update) {
         Contract existing = this.getContract(id);
+        Contract patchEntity = contractMapper.toEntityFromUpdate(update);
 
-        if (update.getClientId() != null) {
-            Optional<Client> client = clientRepository.findById(update.getClientId());
-            if (client.isPresent()) {
-                existing.setClient(client.get());
-            }
-        }
-        if (update.getCostAmount() != null) {
-            existing.setCostAmount(update.getCostAmount());
-        }
-        if (update.getEndDate() != null) {
-            existing.setEndDate(update.getEndDate());
-        }
+        if (patchEntity.getCostAmount() != null)
+            existing.setCostAmount(patchEntity.getCostAmount());
+        if (patchEntity.getEndDate() != null)
+            existing.setEndDate(patchEntity.getEndDate());
 
         return contractRepository.save(existing);
     }

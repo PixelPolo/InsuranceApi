@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.ricci.insuranceapi.insurance_api.InsuranceApiApplicationTests;
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
+import com.ricci.insuranceapi.insurance_api.dto.ContractPatchDto;
 import com.ricci.insuranceapi.insurance_api.exception.ContractNotFoundException;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
@@ -98,13 +99,40 @@ public class ContractServiceTest extends InsuranceApiApplicationTests {
     }
 
     // ------------------------
+    // --- Create contracts ---
+    // ------------------------
+
+    @Test
+    void shouldCreateContract() {
+        Client client = clientRepository.findAll().get(0);
+
+        ContractDto dto = new ContractDto();
+        dto.setCostAmount(new BigDecimal("123.45"));
+
+        LocalDateTime now = LocalDateTime.now();
+        Contract saved = contractService.createContract(dto, client);
+
+        assertThat(saved).isNotNull();
+        assertThat(saved.getContractId()).isNotNull();
+        assertThat(saved.getClient()).isEqualTo(client);
+        assertThat(saved.getCostAmount()).isEqualByComparingTo(new BigDecimal("123.45"));
+        assertThat(isSameLocalDateTime(saved.getStartDate(), now)).isTrue();
+        assertThat(isSameLocalDateTime(saved.getUpdateDate(), now)).isTrue();
+        assertThat(saved.getEndDate()).isNull();
+
+        if (VERBOSE) {
+            LOGGER.info("Contract created successfully: {}", saved);
+        }
+    }
+
+    // ------------------------
     // --- Update contracts ---
     // ------------------------
 
     // Partial update
     @Test
     void shouldPartiallyUpdateContract() {
-        ContractDto update = new ContractDto();
+        ContractPatchDto update = new ContractPatchDto();
         update.setCostAmount(new BigDecimal("1"));
 
         Contract firstContract = contractService.getAllContracts(fullPageRequest).getContent().get(0);
@@ -159,9 +187,9 @@ public class ContractServiceTest extends InsuranceApiApplicationTests {
         });
 
         // Patch
-        ContractDto updates = new ContractDto();
+        ContractPatchDto update = new ContractPatchDto();
         assertThrows(ContractNotFoundException.class, () -> {
-            contractService.partialUpdate(fakeId, updates);
+            contractService.partialUpdate(fakeId, update);
         });
 
         // Delete
