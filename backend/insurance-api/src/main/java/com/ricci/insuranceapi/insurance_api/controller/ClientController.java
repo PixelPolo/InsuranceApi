@@ -1,9 +1,9 @@
 package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
-import com.ricci.insuranceapi.insurance_api.dto.ClientDtoFactory;
 import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
+import com.ricci.insuranceapi.insurance_api.mapper.ClientMapper;
 import com.ricci.insuranceapi.insurance_api.mapper.ContractMapper;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
@@ -36,17 +36,20 @@ import java.util.UUID;
 public class ClientController {
 
     private final ClientService clientService;
+    private final ClientMapper clientMapper;
     private final ContractService contractService;
-    private final PaginationUtils paginationUtils;
     private final ContractMapper contractMapper;
+    private final PaginationUtils paginationUtils;
 
     @Autowired
     public ClientController(
             ClientService clientService,
+            ClientMapper clientMapper,
             ContractService contractService,
-            PaginationUtils paginationUtils,
-            ContractMapper contractMapper) {
+            ContractMapper contractMapper,
+            PaginationUtils paginationUtils) {
         this.clientService = clientService;
+        this.clientMapper = clientMapper;
         this.contractService = contractService;
         this.paginationUtils = paginationUtils;
         this.contractMapper = contractMapper;
@@ -66,7 +69,7 @@ public class ClientController {
         if (clients.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         } else {
-            return ResponseEntity.ok(ClientDtoFactory.fromClients(clients.getContent())); // 200 OK
+            return ResponseEntity.ok(clientMapper.toDtos(clients.getContent())); // 200 OK
         }
     }
 
@@ -74,21 +77,21 @@ public class ClientController {
     @GetMapping("/{id}")
     public ResponseEntity<ClientDto> getClient(@PathVariable UUID id) {
         Client client = clientService.getClient(id); // 404 Not Found → GlobalExceptionHandler
-        return ResponseEntity.ok(ClientDtoFactory.fromClient(client)); // 200 OK
+        return ResponseEntity.ok(clientMapper.toDto(client)); // 200 OK
     }
 
     // PATCH /api/v_/clients/{id}
     @PatchMapping("/{id}")
     public ResponseEntity<ClientDto> patchClient(@PathVariable UUID id, @Valid @RequestBody ClientPatchDto update) {
         Client updated = clientService.partialUpdate(id, update); // 404 Not Found → GlobalExceptionHandler
-        return ResponseEntity.ok(ClientDtoFactory.fromClient(updated)); // 200 OK
+        return ResponseEntity.ok(clientMapper.toDto(updated)); // 200 OK
     }
 
     // DELETE /api/v_/clients/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<ClientDto> deleteClient(@PathVariable UUID id) {
         Client deleted = clientService.deleteClient(id); // 404 Not Found → GlobalExceptionHandler
-        return ResponseEntity.ok(ClientDtoFactory.fromClient(deleted)); // 200 OK with client (soft delete)
+        return ResponseEntity.ok(clientMapper.toDto(deleted)); // 200 OK with client (soft delete)
     }
 
     // -----------------------------------------------

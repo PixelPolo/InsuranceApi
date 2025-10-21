@@ -128,8 +128,7 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
     // --- Delete clients ---
     // ----------------------
 
-    // TODO - Sometimes passes, other times not
-
+    // TODO - Sometimes passes, other times not ?!? Need to debug...
     // Delete -> Soft Delete Client
     @Test
     void shouldSoftDeleteClient() {

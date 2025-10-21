@@ -1,8 +1,8 @@
 package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
-import com.ricci.insuranceapi.insurance_api.dto.ClientDtoFactory;
 import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
+import com.ricci.insuranceapi.insurance_api.mapper.ClientMapper;
 import com.ricci.insuranceapi.insurance_api.model.Company;
 import com.ricci.insuranceapi.insurance_api.service.CompanyService;
 import com.ricci.insuranceapi.insurance_api.utils.PaginationUtils;
@@ -29,11 +29,16 @@ public class CompanyController {
 
     private final CompanyService companyService;
     private final PaginationUtils paginationUtils;
+    private final ClientMapper clientMapper;
 
     @Autowired
-    public CompanyController(CompanyService companyService, PaginationUtils paginationUtils) {
+    public CompanyController(
+            CompanyService companyService,
+            PaginationUtils paginationUtils,
+            ClientMapper clientMapper) {
         this.companyService = companyService;
         this.paginationUtils = paginationUtils;
+        this.clientMapper = clientMapper;
     }
 
     // POST /api/v_/clients/companies
@@ -42,7 +47,7 @@ public class CompanyController {
         Company created = companyService.createCompany(dto);
         String apiVersion = System.getProperty("api.version", "v1");
         URI location = URI.create("/api/" + apiVersion + "/clients/" + created.getClientId()); // Get on /clients/{id}
-        return ResponseEntity.created(location).body(new CompanyDto(created)); // 201 Created
+        return ResponseEntity.created(location).body(clientMapper.toDto(created)); // 201 Created
     }
 
     // GET /api/v_/clients/companies?page=0&size=5&sortBy=name&sortDir=asc
@@ -59,7 +64,7 @@ public class CompanyController {
         if (companies.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         } else {
-            return ResponseEntity.ok(ClientDtoFactory.fromClients(companies.getContent())); // 200 OK
+            return ResponseEntity.ok(clientMapper.toDtos(companies.getContent())); // 200 OK
         }
     }
 

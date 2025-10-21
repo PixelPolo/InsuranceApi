@@ -1,8 +1,8 @@
 package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
-import com.ricci.insuranceapi.insurance_api.dto.ClientDtoFactory;
 import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
+import com.ricci.insuranceapi.insurance_api.mapper.ClientMapper;
 import com.ricci.insuranceapi.insurance_api.model.Person;
 import com.ricci.insuranceapi.insurance_api.service.PersonService;
 import com.ricci.insuranceapi.insurance_api.utils.PaginationUtils;
@@ -29,11 +29,16 @@ public class PersonController {
 
     private final PersonService personService;
     private final PaginationUtils paginationUtils;
+    private final ClientMapper clientMapper;
 
     @Autowired
-    public PersonController(PersonService personService, PaginationUtils paginationUtils) {
+    public PersonController(
+            PersonService personService,
+            PaginationUtils paginationUtils,
+            ClientMapper clientMapper) {
         this.personService = personService;
         this.paginationUtils = paginationUtils;
+        this.clientMapper = clientMapper;
     }
 
     // POST /api/v_/clients/persons
@@ -42,7 +47,7 @@ public class PersonController {
         Person created = personService.createPerson(dto);
         String apiVersion = System.getProperty("api.version", "v1");
         URI location = URI.create("/api/" + apiVersion + "/clients/" + created.getClientId()); // Get on /clients/{id}
-        return ResponseEntity.created(location).body(new PersonDto(created)); // 201 Created
+        return ResponseEntity.created(location).body(clientMapper.toDto(created)); // 201 Created
     }
 
     // GET /api/v_/clients/persons?page=0&size=5&sortBy=name&sortDir=asc
@@ -59,7 +64,7 @@ public class PersonController {
         if (persons.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         } else {
-            return ResponseEntity.ok(ClientDtoFactory.fromClients(persons.getContent())); // 200 OK
+            return ResponseEntity.ok(clientMapper.toDtos(persons.getContent())); // 200 OK
         }
     }
 

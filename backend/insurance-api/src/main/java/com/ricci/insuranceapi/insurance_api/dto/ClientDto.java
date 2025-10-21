@@ -6,7 +6,6 @@ package com.ricci.insuranceapi.insurance_api.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.validation.SwissPhoneNumber;
 import com.ricci.insuranceapi.insurance_api.validation.ValidationMessage;
 
@@ -20,16 +19,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public abstract class ClientDto {
-
-    // TODO - Create a ClientMapper
-    protected ClientDto(Client client) {
-        this.clientId = client.getClientId();
-        this.phone = client.getPhone();
-        this.email = client.getEmail();
-        this.name = client.getName();
-        this.isDeleted = client.getIsDeleted();
-        this.deletionDate = client.getDeletionDate();
-    }
 
     @Null
     private UUID clientId;

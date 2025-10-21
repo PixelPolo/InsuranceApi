@@ -1,6 +1,5 @@
 package com.ricci.insuranceapi.insurance_api.dto;
 
-import com.ricci.insuranceapi.insurance_api.model.Company;
 import com.ricci.insuranceapi.insurance_api.validation.ValidationMessage;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -18,10 +17,5 @@ public class CompanyDto extends ClientDto {
     // flexibility with max 32 chars and no regex
     @Size(max = 32, message = ValidationMessage.IDENTIFIER_MAX_32)
     private String companyIdentifier;
-
-    public CompanyDto(Company company) {
-        super(company);
-        this.companyIdentifier = company.getCompanyIdentifier();
-    }
 
 }
