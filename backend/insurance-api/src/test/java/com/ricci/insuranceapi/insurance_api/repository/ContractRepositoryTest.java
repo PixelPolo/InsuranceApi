@@ -179,4 +179,112 @@ public class ContractRepositoryTest extends InsuranceApiApplicationTests {
                 .isEqualByComparingTo(contract.getCostAmount());
     }
 
+    // --------------------------
+    // --- Custom Queries ---
+    // --------------------------
+
+    // Find only the active contracts for one client
+    @Test
+    void shouldFindActiveContractsForAlice() {
+        // Alice -> endDate NULL → active contract
+        Client client = clientRepository.findAll().get(0);
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Contract> activeContracts = contractRepository.findActiveByClient(client.getClientId(), now);
+
+        assertThat(activeContracts).isNotNull();
+        assertThat(activeContracts.size()).isGreaterThan(0);
+
+        for (Contract c : activeContracts) {
+            if (c.getEndDate() != null) {
+                assertThat(c.getEndDate()).isAfter(now);
+            }
+        }
+
+        if (VERBOSE) {
+            LOGGER.info("Active contracts for Alice ({}): {}", client.getClientId(), activeContracts);
+        }
+    }
+
+    // Find zero active contract if endDate is before the given date
+    @Test
+    void shouldFindZeroActiveContractsForBob() {
+        // Bob -> endDate = 2025-12-01
+        Client client = clientRepository.findAll().get(1);
+        LocalDateTime futureDate = LocalDateTime.of(2026, 1, 1, 0, 0);
+
+        List<Contract> activeContracts = contractRepository.findActiveByClient(client.getClientId(), futureDate);
+
+        assertThat(activeContracts).isNotNull();
+        assertThat(activeContracts).isEmpty();
+
+        if (VERBOSE) {
+            LOGGER.info("No active contracts for Bob ({}): {}", client.getClientId(), activeContracts);
+        }
+    }
+
+    // Find active contracts for a client after a given update date
+    @Test
+    void shouldFindActiveContractsUpdatedAfter() {
+        // Alice -> endDate NULL, update_date = 2024-01-15
+        Client client = clientRepository.findAll().get(0);
+        LocalDateTime beforeUpdateDate = LocalDateTime.of(2023, 1, 1, 0, 0);
+
+        List<Contract> activeContracts = contractRepository.findActiveByClientUpdatedAfter(
+                client.getClientId(),
+                LocalDateTime.now(),
+                beforeUpdateDate);
+
+        assertThat(activeContracts).isNotNull();
+        assertThat(activeContracts.size()).isGreaterThan(0);
+
+        for (Contract c : activeContracts) {
+            if (c.getEndDate() != null) {
+                assertThat(c.getEndDate()).isAfter(LocalDateTime.now());
+            }
+            assertThat(c.getUpdateDate()).isAfter(beforeUpdateDate);
+        }
+
+        if (VERBOSE) {
+            LOGGER.info("Active contracts for Alice after {}: {}", beforeUpdateDate, activeContracts);
+        }
+    }
+
+    // Find zero active contract if updatedAfter is in the future
+    @Test
+    void shouldNotFindActiveContractsAfterFutureDate() {
+        // Alice -> endDate NULL, update_date = 2024-01-15
+        Client client = clientRepository.findAll().get(0);
+        LocalDateTime afterUpdateDate = LocalDateTime.of(2025, 1, 1, 0, 0);
+
+        List<Contract> activeContracts = contractRepository.findActiveByClientUpdatedAfter(
+                client.getClientId(),
+                LocalDateTime.now(),
+                afterUpdateDate);
+
+        assertThat(activeContracts).isNotNull();
+        assertThat(activeContracts).isEmpty();
+
+        if (VERBOSE) {
+            LOGGER.info("No active contracts for Alice updated after {}: {}", afterUpdateDate, activeContracts);
+        }
+    }
+
+    // Sum of all active contracts for a client
+    @Test
+    void shouldSumActiveContractsCostForAlice() {
+        // Alice -> one active contract, cost = 400.00
+        Client client = clientRepository.findAll().get(0);
+        LocalDateTime now = LocalDateTime.now();
+
+        BigDecimal total = contractRepository.sumActiveContractsCost(client.getClientId(), now);
+
+        assertThat(total).isNotNull();
+        assertThat(total).isEqualByComparingTo(new BigDecimal("400.00"));
+
+        if (VERBOSE) {
+            LOGGER.info("Total active contracts cost for Alice ({}): {}", client.getClientId(), total);
+        }
+    }
+
 }
