@@ -1,8 +1,6 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -144,10 +142,7 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
         // Second deletion should not change anything
         Client secondDeleted = clientService.deleteClient(firstClient.getClientId());
         assertThat(secondDeleted.getIsDeleted()).isTrue();
-
-        LocalDateTime firstDeletionDate = firstDeleted.getDeletionDate();
-        LocalDateTime seconDeletionDate = secondDeleted.getDeletionDate();
-        assertThat(ChronoUnit.SECONDS.between(firstDeletionDate, seconDeletionDate)).isLessThan(2);
+        assertThat(isSameLocalDateTime(firstDeleted.getDeletionDate(), secondDeleted.getDeletionDate())).isTrue();
     }
 
     // ------------------

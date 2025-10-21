@@ -124,6 +124,21 @@ public class ClientRepositoryTest extends InsuranceApiApplicationTests {
     }
 
     // ---------------------
+    // --- Update Client ---
+    // ---------------------
+
+    @Test
+    void shouldUpdateClient() {
+        Client client = clientRepository.findAll().get(0);
+        String newEmail = "updated@example.com";
+        client.setEmail(newEmail);
+
+        Client updated = clientRepository.save(client);
+
+        assertThat(updated.getEmail()).isEqualTo(newEmail);
+    }
+
+    // ---------------------
     // --- Delete Client ---
     // ---------------------
 

@@ -3,6 +3,8 @@ package com.ricci.insuranceapi.insurance_api;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,11 @@ public abstract class InsuranceApiApplicationTests {
 
 	@Test
 	void contextLoads() {
+	}
+
+	protected boolean isSameLocalDateTime(LocalDateTime dateOne, LocalDateTime dateTwo) {
+		long precisionSeconds = 2; // To avoid time precision error
+		return Math.abs(ChronoUnit.SECONDS.between(dateOne, dateTwo)) < precisionSeconds;
 	}
 
 }

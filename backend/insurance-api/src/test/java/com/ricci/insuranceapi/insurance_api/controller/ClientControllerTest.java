@@ -20,7 +20,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -312,8 +311,8 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
         String deletedDateStr = deletedClient.read("$.deletionDate");
         assertThat(deletedDateStr).isNotNull();
         LocalDateTime deletionDate = LocalDateTime.parse(deletedDateStr);
-        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        assertThat(ChronoUnit.SECONDS.between(deletionDate, now)).isLessThan(2);
+        LocalDateTime now = LocalDateTime.now();
+        assertThat(isSameLocalDateTime(deletionDate, now)).isTrue();
 
         if (VERBOSE) {
             LOGGER.info("DELETE {}/{} → {}", PATH, firstClientId, isDeleted);
