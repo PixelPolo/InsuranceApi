@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CompanyService {
 
-    // TODO - Improve the service according requirements
-
     private final CompanyRepository companyRepository;
     private final ClientService clientService;
 
@@ -24,9 +22,17 @@ public class CompanyService {
         this.clientService = clientService;
     }
 
+    // ----------------------
+    // --- Read companies ---
+    // ----------------------
+
     public Page<Company> getAllCompanies(Pageable pageable) {
         return companyRepository.findAll(pageable);
     }
+
+    // ----------------------
+    // --- Create company ---
+    // ----------------------
 
     public Company createCompany(CompanyDto dto) {
         Company company = new Company(dto);
@@ -34,6 +40,10 @@ public class CompanyService {
         clientService.validateUniquePhoneOrEmail(company);
         return companyRepository.save(company);
     }
+
+    // ------------------
+    // --- Exceptions ---
+    // ------------------
 
     private void checkUniqueCompanyIdentifier(String id) {
         if (companyRepository.existsByCompanyIdentifier(id)) {

@@ -1,9 +1,6 @@
 package com.ricci.insuranceapi.insurance_api.mapper;
 
-import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
-import com.ricci.insuranceapi.insurance_api.dto.ContractExpandedDto;
-import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
 import com.ricci.insuranceapi.insurance_api.model.Person;
 
@@ -90,30 +87,6 @@ class ContractMapperTest {
         assertThat(contractDto.getStartDate()).isEqualTo(sampleContract.getStartDate());
         assertThat(contractDto.getEndDate()).isEqualTo(sampleContract.getEndDate()); // null
         assertThat(contractDto.getCostAmount()).isEqualByComparingTo(sampleContract.getCostAmount());
-
-    }
-
-    // toExpandedDto()
-    @Test
-    void shouldMapEntityToExpandedDto() {
-        ContractExpandedDto expandedDto = contractMapper.toExpandedDto(sampleContract);
-
-        assertThat(expandedDto).isNotNull();
-        assertThat(expandedDto.getContractId()).isEqualTo(sampleContract.getContractId());
-        assertThat(expandedDto.getStartDate()).isEqualTo(sampleContract.getStartDate());
-        assertThat(expandedDto.getEndDate()).isEqualTo(sampleContract.getEndDate());
-        assertThat(expandedDto.getCostAmount()).isEqualByComparingTo(sampleContract.getCostAmount());
-
-        // Client
-        assertThat(expandedDto.getClient()).isNotNull().isInstanceOf(ClientDto.class);
-        assertThat(expandedDto.getClient().getName()).isEqualTo(sampleClient.getName());
-        assertThat(expandedDto.getClient().getEmail()).isEqualTo(sampleClient.getEmail());
-        assertThat(expandedDto.getClient().getPhone()).isEqualTo(sampleClient.getPhone());
-
-        // If a Person, check birthdate
-        assertThat(expandedDto.getClient()).isInstanceOf(PersonDto.class);
-        PersonDto personDto = (PersonDto) expandedDto.getClient();
-        assertThat(personDto.getBirthdate()).isEqualTo(LocalDate.of(1995, 3, 12));
     }
 
     // toDtoList() Method Test
@@ -127,20 +100,6 @@ class ContractMapperTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getClientId()).isEqualTo(sampleClient.getClientId());
         assertThat(result.get(0).getCostAmount()).isEqualByComparingTo(sampleContractDto.getCostAmount());
-
-    }
-
-    // toExpandedDtoList()
-    @Test
-    void shouldMapEntityListToExpandedDtoList() {
-        List<Contract> list = new ArrayList<>();
-        list.add(sampleContract);
-
-        List<ContractExpandedDto> result = contractMapper.toExpandedDtoList(list);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getClient()).isInstanceOf(ClientDto.class);
-        assertThat(result.get(0).getClient().getName()).isEqualTo("Alice Dupont");
     }
 
 }

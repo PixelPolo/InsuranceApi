@@ -1,8 +1,6 @@
 package com.ricci.insuranceapi.insurance_api.mapper;
 
-import com.ricci.insuranceapi.insurance_api.dto.ClientDtoFactory;
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
-import com.ricci.insuranceapi.insurance_api.dto.ContractExpandedDto;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
 
@@ -14,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContractMapper {
 
-    // POST & PATCH - ContractDto -> Contract
+    // ContractDto -> Contract
     public Contract toEntity(ContractDto contractDto, Client client) {
         Contract contractEntity = new Contract();
         contractEntity.setClient(client); // Fetched by the caller
@@ -25,7 +23,7 @@ public class ContractMapper {
         return contractEntity;
     }
 
-    // GET (simple) - Contract -> ContractDto (with only the Client's UUID)
+    // Contract -> ContractDto
     public ContractDto toDto(Contract contractEntity) {
         ContractDto contractDto = new ContractDto();
         contractDto.setContractId(contractEntity.getContractId());
@@ -36,17 +34,6 @@ public class ContractMapper {
         return contractDto;
     }
 
-    // GET (expanded) - Contract -> ContractExpandedDto (with the full Client)
-    public ContractExpandedDto toExpandedDto(Contract contractEntity) {
-        ContractExpandedDto contractExpandedDto = new ContractExpandedDto();
-        contractExpandedDto.setContractId(contractEntity.getContractId());
-        contractExpandedDto.setClient(ClientDtoFactory.fromClient(contractEntity.getClient()));
-        contractExpandedDto.setStartDate(contractEntity.getStartDate());
-        contractExpandedDto.setEndDate(contractEntity.getEndDate());
-        contractExpandedDto.setCostAmount(contractEntity.getCostAmount());
-        return contractExpandedDto;
-    }
-
     // List ContractDto
     public List<ContractDto> toDtoList(List<Contract> contracts) {
         List<ContractDto> result = new ArrayList<>();
@@ -55,18 +42,6 @@ public class ContractMapper {
         }
         for (Contract contract : contracts) {
             result.add(toDto(contract));
-        }
-        return result;
-    }
-
-    // List ContractExpandedDto
-    public List<ContractExpandedDto> toExpandedDtoList(List<Contract> contracts) {
-        List<ContractExpandedDto> result = new ArrayList<>();
-        if (contracts == null) {
-            return result;
-        }
-        for (Contract contract : contracts) {
-            result.add(toExpandedDto(contract));
         }
         return result;
     }

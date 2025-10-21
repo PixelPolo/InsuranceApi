@@ -179,9 +179,9 @@ public class ContractRepositoryTest extends InsuranceApiApplicationTests {
                 .isEqualByComparingTo(contract.getCostAmount());
     }
 
-    // --------------------------
-    // --- Custom Queries ---
-    // --------------------------
+    // ----------------------
+    // --- Custom queries ---
+    // ----------------------
 
     // Find only the active contracts for one client
     @Test

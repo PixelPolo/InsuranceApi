@@ -1,6 +1,7 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,10 @@ import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
 import com.ricci.insuranceapi.insurance_api.exception.ClientInvalidDataException;
 import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
 import com.ricci.insuranceapi.insurance_api.model.Client;
+import com.ricci.insuranceapi.insurance_api.model.Contract;
 import com.ricci.insuranceapi.insurance_api.model.Person;
+
+import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,10 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 class ClientServiceTest extends InsuranceApiApplicationTests {
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private ContractService contractService;
 
     private PageRequest fullPageRequest = PageRequest.of(0, 10);
     private PageRequest firstPageSizeOne = PageRequest.of(0, 1);
@@ -70,7 +78,7 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
 
     // Read -> Pagination
     @Test
-    void shouldfirstClientWithPagination() {
+    void shouldFindFirstClientWithPagination() {
         Page<Client> page = clientService.getAllClients(firstPageSizeOne);
 
         assertThat(page.getContent()).hasSize(1);
@@ -78,6 +86,10 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
 
         Client first = page.getContent().get(0);
         assertThat(first).isNotNull();
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            page.getContent().get(1);
+        });
 
         if (VERBOSE) {
             LOGGER.info("Page 0 size 1 returned client: {}", first);
@@ -91,12 +103,12 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
     // Partial update
     @Test
     void shouldPartiallyUpdateClient() {
-        ClientPatchDto updates = new ClientPatchDto();
-        updates.setName("Updated Name");
-        updates.setEmail("updated@example.com");
+        ClientPatchDto update = new ClientPatchDto();
+        update.setName("Updated Name");
+        update.setEmail("updated@example.com");
 
         Client firstClient = clientService.getAllClients(fullPageRequest).getContent().get(0);
-        Client firstClientUpdated = clientService.partialUpdate(firstClient.getClientId(), updates);
+        Client firstClientUpdated = clientService.partialUpdate(firstClient.getClientId(), update);
 
         assertThat(firstClientUpdated.getName()).isEqualTo("Updated Name");
         assertThat(firstClientUpdated.getEmail()).isEqualTo("updated@example.com");
@@ -120,7 +132,13 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
     @Test
     void shouldSoftDeleteClient() {
         Client firstClient = clientService.getAllClients(fullPageRequest).getContent().get(0);
+        List<Contract> firstContracts = contractService.getActiveContracts(firstClient.getClientId());
+
         Client deleted = clientService.deleteClient(firstClient.getClientId());
+        List<Contract> deletedContracts = contractService.getActiveContracts(deleted.getClientId());
+
+        assertThat(firstContracts).isNotNull().isNotEmpty();
+        assertThat(deletedContracts).isNotNull().isEmpty(); // No active contracts
 
         LocalDate deletionDate = deleted.getDeletionDate().toLocalDate();
         assertThat(deletionDate).isEqualTo(LocalDate.now());

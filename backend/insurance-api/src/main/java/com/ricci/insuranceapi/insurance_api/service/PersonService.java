@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class PersonService {
 
-    // TODO - Improve the service according requirements
-
     private final PersonRepository personRepository;
     private final ClientService clientService;
 
@@ -23,9 +21,17 @@ public class PersonService {
         this.clientService = clientService;
     }
 
+    // ----------------------
+    // --- Read persons ---
+    // ----------------------
+
     public Page<Person> getAllPersons(Pageable pageable) {
         return personRepository.findAll(pageable);
     }
+
+    // ----------------------
+    // --- Create persons ---
+    // ----------------------
 
     public Person createPerson(PersonDto dto) {
         Person person = new Person(dto);

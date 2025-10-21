@@ -13,18 +13,23 @@ import com.ricci.insuranceapi.insurance_api.exception.ClientInvalidDataException
 import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
 import com.ricci.insuranceapi.insurance_api.repository.ClientRepository;
 import com.ricci.insuranceapi.insurance_api.model.Client;
+import com.ricci.insuranceapi.insurance_api.model.Contract;
 
 @Service
 public class ClientService {
 
-    // TODO - Improve the service according requirements
-
     private final ClientRepository clientRepository;
+    private final ContractService contractService;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, ContractService contractService) {
         this.clientRepository = clientRepository;
+        this.contractService = contractService;
     }
+
+    // --------------------
+    // --- Read clients ---
+    // --------------------
 
     public Page<Client> getAllClients(Pageable pageable) {
         return clientRepository.findAll(pageable);
@@ -33,6 +38,10 @@ public class ClientService {
     public Client getClient(UUID id) {
         return clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException(id));
     }
+
+    // ----------------------
+    // --- Update clients ---
+    // ----------------------
 
     public Client partialUpdate(UUID id, ClientPatchDto updates) {
         Client existing = this.getClient(id);
@@ -53,6 +62,10 @@ public class ClientService {
         return clientRepository.save(existing);
     }
 
+    // ----------------------
+    // --- Delete clients ---
+    // ----------------------
+
     public Client deleteClient(UUID id) {
         // Soft delete for archives
         Client client = this.getClient(id);
@@ -61,13 +74,30 @@ public class ClientService {
         } else {
             client.setIsDeleted(true);
             client.setDeletionDate(LocalDateTime.now());
+            closeContracts(id); // REQUIREMENT: Client is deleted -> end date updated for its contracts
             return clientRepository.save(client);
-            // TODO - Update end date of client's contracts
         }
     }
 
+    private void closeContracts(UUID clientId) {
+        Page<Contract> allContracts = contractService.getAllContracts(Pageable.unpaged());
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Contract contract : allContracts.getContent()) {
+            if (contract.getClient().getClientId().equals(clientId)) {
+                if (contract.getEndDate() == null || contract.getEndDate().isAfter(now)) {
+                    contractService.deleteContract(contract.getContractId());
+                }
+            }
+        }
+    }
+
+    // ------------------
+    // --- Exceptions ---
+    // ------------------
+
+    // Helper for POST on concrete childs class
     protected void validateUniquePhoneOrEmail(Client client) {
-        // Helper for POST on concrete childs class
         if (clientRepository.existsByPhone(client.getPhone())) {
             throw new ClientInvalidDataException("Phone already exists");
         }
