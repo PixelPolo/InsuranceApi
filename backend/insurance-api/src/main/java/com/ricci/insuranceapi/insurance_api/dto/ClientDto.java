@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class ClientDto {
 
+    // TODO - Create a ClientMapper
     protected ClientDto(Client client) {
         this.clientId = client.getClientId();
         this.phone = client.getPhone();

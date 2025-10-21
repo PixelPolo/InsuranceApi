@@ -9,8 +9,8 @@ For this attempt, I relied on the following tools and resources:
 - Several of my personal projects, which helped with SQL, Dockerfiles, and application setup.
 - Draw.io, used to quickly create an Entity–Relationship (ER) model for the database.
 - Spring Initializr, official Spring documentation, and courses from Spring Academy.
-- Medium articles, as I often find them insightful and high-quality.
-- ChatGPT 5, mainly for discussions to validate design decisions, provide code guidance, and translate content from French to English.
+- Medium and Baeldung articles, as I often find them insightful and high-quality.
+- ChatGPT 5 to validate design decisions, provide code guidance, and translate content.
 - VS Code, without using GitHub Copilot.
 
 ## Project structure

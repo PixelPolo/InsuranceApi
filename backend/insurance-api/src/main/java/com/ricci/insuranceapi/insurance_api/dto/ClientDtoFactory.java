@@ -14,6 +14,7 @@ import com.ricci.insuranceapi.insurance_api.model.Company;
 
 public final class ClientDtoFactory {
 
+    // TODO - Create a ClientMapper and move this class inside /mapper
     private ClientDtoFactory() {
     }
 

@@ -29,6 +29,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public abstract class Client {
 
+    // TODO - Create a ClientMapper
     protected Client(ClientDto dto) {
         this.clientId = dto.getClientId();
         this.phone = dto.getPhone();

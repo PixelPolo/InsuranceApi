@@ -15,6 +15,13 @@ import com.ricci.insuranceapi.insurance_api.model.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/*
+ * This class tests the ClientRepository to verify the communication
+ * between Spring Boot, Hibernate, and the PostgreSQL database.
+ * Test data is loaded from InsuranceApiApplicationTests parent class.
+ * Inspired by Spring Academy materials
+ */
+
 @SpringBootTest
 @ActiveProfiles("test")
 public class ClientRepositoryTest extends InsuranceApiApplicationTests {

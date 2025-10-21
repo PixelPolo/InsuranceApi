@@ -12,4 +12,5 @@ public interface ValidationMessage {
     String NAME_MAX_64 = "Name must be at most 64 characters";
     String IDENTIFIER_MAX_32 = "Identifier must be at most 32 characters";
     String PAST_OR_PRESENT = "Must be a date or time in the past or present";
+    String COST_AMOUNT_POS = "Cost amount must be positive or zero";
 }
