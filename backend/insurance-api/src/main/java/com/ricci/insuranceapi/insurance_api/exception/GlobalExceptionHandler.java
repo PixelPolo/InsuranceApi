@@ -6,12 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.ricci.insuranceapi.insurance_api.validation.ValidationMessage;
 
 /* 
  * Catches exceptions globally from controllers 
@@ -49,6 +53,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnrecognizedPropertyException.class)
     public ResponseEntity<String> handleUnknownField(UnrecognizedPropertyException ex) {
         String message = "Unknown field: " + ex.getPropertyName();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(InvalidFormatException.class)
+    public ResponseEntity<String> handleInvalidFormat(InvalidFormatException ex) {
+        String message = ValidationMessage.DATE_INVALID;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleInvalidJson(HttpMessageNotReadableException ex) {
+        String message = ValidationMessage.DATA_TYPE_INVALID;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = ValidationMessage.DATE_INVALID;
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 

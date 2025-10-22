@@ -13,4 +13,6 @@ public interface ValidationMessage {
     String IDENTIFIER_MAX_32 = "Identifier must be at most 32 characters";
     String PAST_OR_PRESENT = "Must be a date or time in the past or present";
     String COST_AMOUNT_POS = "Cost amount must be positive or zero";
+    String DATE_INVALID = "Date time must be yyyy-MM-ddTHH:mm:ss";
+    String DATA_TYPE_INVALID = "Invalid data type (number, date, boolean, etc.)";
 }

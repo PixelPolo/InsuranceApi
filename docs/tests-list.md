@@ -14,8 +14,8 @@
 - PATCH /clients/{id} -> error codes
 - DELETE /clients/{id}
 - DELETE /clients/{id} -> Error codes
-- GET /clients/{id}/contracts/active
-- GET /clients/{id}/contracts/active -> wrong UUID
+- GET /clients/{id}/contracts
+- GET /clients/{id}/contracts -> wrong UUID
 - Get active contracts for a client after a given update date
 - Get no active contracts for a client after a given update date
 - GET /clients/{id}/contracts/after -> bad date format

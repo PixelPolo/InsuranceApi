@@ -337,13 +337,13 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
     // --- GET /clients/{id}/contracts/active ---
     // ------------------------------------------
 
-    // GET /clients/{id}/contracts/active
+    // GET /clients/{id}/contracts
     @Test
     void shouldGetActiveContractsForClient() {
         String firstClientId = getFirstClientId();
 
         ResponseEntity<String> response = rest.getForEntity(
-                PATH + "/" + firstClientId + "/contracts/active", String.class);
+                PATH + "/" + firstClientId + "/contracts", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -358,11 +358,11 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
         }
     }
 
-    // GET /clients/{id}/contracts/active -> wrong UUID
+    // GET /clients/{id}/contracts -> wrong UUID
     @Test
     void shouldNotGetActiveContractsForWrongClient() {
         String fakeId = "00000000-0000-0000-0000-000000000000";
-        ResponseEntity<String> resp = rest.getForEntity(PATH + "/" + fakeId + "/contracts/active", String.class);
+        ResponseEntity<String> resp = rest.getForEntity(PATH + "/" + fakeId + "/contracts", String.class);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT); // 204
     }
 

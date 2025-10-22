@@ -78,12 +78,21 @@ public class ContractService {
     public Contract deleteContract(UUID id) {
         // Soft delete according to requirements
         Contract contract = this.getContract(id);
+        // If the end date is not null (could be in the future) -> Do nothing
         if (contract.getEndDate() != null) {
             return contract;
         } else {
             contract.setEndDate(LocalDateTime.now());
             return contractRepository.save(contract);
         }
+    }
+
+    public Contract forceCloseContract(UUID id) {
+        // Replace any end date (also if not null) to now
+        Contract contract = this.getContract(id);
+        LocalDateTime now = LocalDateTime.now();
+        contract.setEndDate(now);
+        return contractRepository.save(contract);
     }
 
     // -----------------------

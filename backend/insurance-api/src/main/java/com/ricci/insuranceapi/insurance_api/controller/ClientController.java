@@ -2,7 +2,7 @@ package com.ricci.insuranceapi.insurance_api.controller;
 
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
 import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
-import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
+import com.ricci.insuranceapi.insurance_api.dto.ContractGetDto;
 import com.ricci.insuranceapi.insurance_api.mapper.ClientMapper;
 import com.ricci.insuranceapi.insurance_api.mapper.ContractMapper;
 import com.ricci.insuranceapi.insurance_api.model.Client;
@@ -98,14 +98,14 @@ public class ClientController {
     // --- Custom routes according to requirements ---
     // -----------------------------------------------
 
-    // GET /api/v_/clients/{id}/contracts/active
-    @GetMapping("/{id}/contracts/active")
-    public ResponseEntity<List<ContractDto>> getContractsByClient(@PathVariable UUID id) {
+    // GET /api/v_/clients/{id}/contracts
+    @GetMapping("/{id}/contracts")
+    public ResponseEntity<List<ContractGetDto>> getContractsByClient(@PathVariable UUID id) {
         List<Contract> contracts = contractService.getActiveContracts(id);
         if (contracts.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         }
-        return ResponseEntity.ok(contractMapper.toDtoList(contracts)); // 200 OK
+        return ResponseEntity.ok(contractMapper.toContractGetDtoList(contracts)); // 200 OK
     }
 
     // GET /api/v_/clients/{id}/contracts/costsum
@@ -117,14 +117,14 @@ public class ClientController {
 
     // GET /api/v_/clients/{id}/contracts/after?date=2025-01-01T00:00:00
     @GetMapping("/{id}/contracts/after")
-    public ResponseEntity<List<ContractDto>> getContractsUpdatedAfter(
+    public ResponseEntity<List<ContractGetDto>> getContractsUpdatedAfter(
             @PathVariable UUID id,
             @RequestParam("date") LocalDateTime updatedAfter) {
         List<Contract> contracts = contractService.getActiveContractsUpdatedAfter(id, updatedAfter);
         if (contracts.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         }
-        return ResponseEntity.ok(contractMapper.toDtoList(contracts)); // 200 OK
+        return ResponseEntity.ok(contractMapper.toContractGetDtoList(contracts)); // 200 OK
     }
 
 }

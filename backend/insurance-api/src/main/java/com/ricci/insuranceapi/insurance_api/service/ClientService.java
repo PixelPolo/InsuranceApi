@@ -1,6 +1,7 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,15 +81,9 @@ public class ClientService {
     }
 
     private void closeContracts(UUID clientId) {
-        Page<Contract> allContracts = contractService.getAllContracts(Pageable.unpaged());
-        LocalDateTime now = LocalDateTime.now();
-
-        for (Contract contract : allContracts.getContent()) {
-            if (contract.getClient().getClientId().equals(clientId)) {
-                if (contract.getEndDate() == null || contract.getEndDate().isAfter(now)) {
-                    contractService.deleteContract(contract.getContractId());
-                }
-            }
+        List<Contract> contracts = contractService.getActiveContracts(clientId);
+        for (Contract contract : contracts) {
+            contractService.forceCloseContract(contract.getContractId());
         }
     }
 

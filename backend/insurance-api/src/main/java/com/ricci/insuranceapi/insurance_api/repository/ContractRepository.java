@@ -14,6 +14,7 @@ public interface ContractRepository extends JpaRepository<Contract, UUID> {
         // REQUIREMENT: Get only the active contracts for one client
         @Query("""
                         SELECT c FROM Contract c
+                        JOIN FETCH c.client
                         WHERE c.client.clientId = :clientId
                         AND (c.endDate IS NULL OR :currentDate < c.endDate)
                         """)
