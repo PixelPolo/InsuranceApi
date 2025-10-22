@@ -36,8 +36,9 @@ A `docker-compose.yml` file is provided to start the entire stack with a single 
 docker compose up -d --build
 ```
 
-The backend will be available at <http://localhost:8080>  
-and pgAdmin at <http://localhost:8888>
+- backend will be available at <http://localhost:8080>  
+- swagger docs at <http://localhost:8080/swagger-ui/index.html>
+- pgAdmin at <http://localhost:8888>
 
 ### PGAdmin (Optional)
 

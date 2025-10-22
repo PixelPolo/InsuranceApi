@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
+import com.ricci.insuranceapi.insurance_api.dto.ContractGetDto;
 import com.ricci.insuranceapi.insurance_api.dto.ContractPatchDto;
 import com.ricci.insuranceapi.insurance_api.mapper.ContractMapper;
 import com.ricci.insuranceapi.insurance_api.model.Client;
@@ -52,7 +53,7 @@ public class ContractController {
 
     // GET /api/v_/contracts?page=0&size=5&sortBy=updateDate&sortDir=asc
     @GetMapping
-    public ResponseEntity<List<ContractDto>> getAllContracts(
+    public ResponseEntity<List<ContractGetDto>> getAllContracts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "updateDate") String sortBy,
@@ -64,15 +65,15 @@ public class ContractController {
         if (contracts.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         } else {
-            return ResponseEntity.ok(contractMapper.toDtoList(contracts.getContent())); // 200 OK
+            return ResponseEntity.ok(contractMapper.toContractGetDtoList(contracts.getContent())); // 200 OK
         }
     }
 
     // GET /api/v_/contracts/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<ContractDto> getContract(@PathVariable UUID id) {
+    public ResponseEntity<ContractGetDto> getContract(@PathVariable UUID id) {
         Contract contract = contractService.getContract(id); // 404 Not Found -> GlobalExceptionHandler
-        return ResponseEntity.ok(contractMapper.toDto(contract)); // 200 OK
+        return ResponseEntity.ok(contractMapper.toContractGetDto(contract)); // 200 OK
     }
 
     // POST /api/v_/contracts

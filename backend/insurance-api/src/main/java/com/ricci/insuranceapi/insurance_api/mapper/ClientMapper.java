@@ -3,6 +3,7 @@ package com.ricci.insuranceapi.insurance_api.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.stereotype.Component;
 
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
@@ -17,6 +18,9 @@ public final class ClientMapper {
 
     // ClientDto -> Client
     public ClientDto toDto(Client client) {
+        if (client instanceof HibernateProxy proxy) {
+            client = (Client) proxy.getHibernateLazyInitializer().getImplementation();
+        }
         if (client instanceof Person person) {
             return toPersonDto(person);
         } else if (client instanceof Company company) {

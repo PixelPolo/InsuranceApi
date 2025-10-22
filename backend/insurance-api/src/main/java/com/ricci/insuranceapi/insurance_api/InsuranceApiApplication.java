@@ -16,7 +16,7 @@ public class InsuranceApiApplication {
 
 	@GetMapping("/")
 	public String hello() {
-		return String.format("Hello World !");
+		return String.format("Hello Api Factory !");
 	}
 
 }

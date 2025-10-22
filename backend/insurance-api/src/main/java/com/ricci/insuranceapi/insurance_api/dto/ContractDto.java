@@ -2,6 +2,8 @@ package com.ricci.insuranceapi.insurance_api.dto;
 
 import com.ricci.insuranceapi.insurance_api.validation.ValidationMessage;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,6 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ContractDto {
 
+    @Schema(description = "Must be null on creation (generated)", accessMode = Schema.AccessMode.READ_ONLY)
     @Null
     private UUID contractId;
 
