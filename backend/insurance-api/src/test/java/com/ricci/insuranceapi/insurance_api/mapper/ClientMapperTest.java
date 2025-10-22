@@ -1,12 +1,17 @@
 package com.ricci.insuranceapi.insurance_api.mapper;
 
-import com.ricci.insuranceapi.insurance_api.dto.*;
-import com.ricci.insuranceapi.insurance_api.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
+import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
+import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
+import com.ricci.insuranceapi.insurance_api.model.Client;
+import com.ricci.insuranceapi.insurance_api.model.Company;
+import com.ricci.insuranceapi.insurance_api.model.Person;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

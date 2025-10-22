@@ -50,7 +50,7 @@ public class ContractController {
         this.clientService = clientService;
     }
 
-    // GET /api/v_/contracts?page=0&size=5&sortBy=name&sortDir=asc
+    // GET /api/v_/contracts?page=0&size=5&sortBy=updateDate&sortDir=asc
     @GetMapping
     public ResponseEntity<List<ContractDto>> getAllContracts(
             @RequestParam(defaultValue = "0") int page,

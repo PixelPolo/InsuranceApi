@@ -102,6 +102,7 @@ public class ContractServiceTest extends InsuranceApiApplicationTests {
     // --- Create contracts ---
     // ------------------------
 
+    // Create -> Create a Contract
     @Test
     void shouldCreateContract() {
         Client client = clientRepository.findAll().get(0);
@@ -129,7 +130,7 @@ public class ContractServiceTest extends InsuranceApiApplicationTests {
     // --- Update contracts ---
     // ------------------------
 
-    // Partial update
+    // Update -> Partial update
     @Test
     void shouldPartiallyUpdateContract() {
         ContractPatchDto update = new ContractPatchDto();

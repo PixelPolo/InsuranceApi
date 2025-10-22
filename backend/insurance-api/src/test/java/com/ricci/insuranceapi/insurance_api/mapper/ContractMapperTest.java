@@ -89,7 +89,7 @@ class ContractMapperTest {
         assertThat(contractDto.getCostAmount()).isEqualByComparingTo(sampleContract.getCostAmount());
     }
 
-    // toDtoList() Method Test
+    // toDtoList()
     @Test
     void shouldMapEntityListToDtoList() {
         List<Contract> list = new ArrayList<>();

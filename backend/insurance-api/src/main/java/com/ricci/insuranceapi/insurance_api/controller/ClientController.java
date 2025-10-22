@@ -98,7 +98,7 @@ public class ClientController {
     // --- Custom routes according to requirements ---
     // -----------------------------------------------
 
-    // GET /api/v1/clients/{id}/contracts/active
+    // GET /api/v_/clients/{id}/contracts/active
     @GetMapping("/{id}/contracts/active")
     public ResponseEntity<List<ContractDto>> getContractsByClient(@PathVariable UUID id) {
         List<Contract> contracts = contractService.getActiveContracts(id);
@@ -108,14 +108,14 @@ public class ClientController {
         return ResponseEntity.ok(contractMapper.toDtoList(contracts)); // 200 OK
     }
 
-    // GET /api/v1/clients/{id}/contracts/costsum
+    // GET /api/v_/clients/{id}/contracts/costsum
     @GetMapping("/{id}/contracts/costsum")
     public ResponseEntity<BigDecimal> getContractsSummary(@PathVariable UUID id) {
         BigDecimal sum = contractService.getSumOfActiveContractsCost(id);
         return ResponseEntity.ok(sum); // 200 OK
     }
 
-    // GET /api/v1/clients/{id}/contracts/after?date=2025-01-01T00:00:00
+    // GET /api/v_/clients/{id}/contracts/after?date=2025-01-01T00:00:00
     @GetMapping("/{id}/contracts/after")
     public ResponseEntity<List<ContractDto>> getContractsUpdatedAfter(
             @PathVariable UUID id,

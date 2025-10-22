@@ -2,6 +2,7 @@ package com.ricci.insuranceapi.insurance_api.service;
 
 import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
 import com.ricci.insuranceapi.insurance_api.exception.ClientInvalidDataException;
+import com.ricci.insuranceapi.insurance_api.mapper.ClientMapper;
 import com.ricci.insuranceapi.insurance_api.model.Company;
 import com.ricci.insuranceapi.insurance_api.repository.CompanyRepository;
 
@@ -15,11 +16,16 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final ClientService clientService;
+    private final ClientMapper clientMapper;
 
     @Autowired
-    public CompanyService(CompanyRepository companyRepository, ClientService clientService) {
+    public CompanyService(
+            CompanyRepository companyRepository,
+            ClientService clientService,
+            ClientMapper clientMapper) {
         this.companyRepository = companyRepository;
         this.clientService = clientService;
+        this.clientMapper = clientMapper;
     }
 
     // ----------------------
@@ -35,7 +41,7 @@ public class CompanyService {
     // ----------------------
 
     public Company createCompany(CompanyDto dto) {
-        Company company = new Company(dto);
+        Company company = (Company) clientMapper.toEntity(dto);
         checkUniqueCompanyIdentifier(company.getCompanyIdentifier());
         clientService.validateUniquePhoneOrEmail(company);
         return companyRepository.save(company);

@@ -189,6 +189,7 @@ public class ContractControllerTest extends InsuranceApiApplicationTests {
     // --- PATCH /contracts/{id} ---
     // -----------------------------
 
+    // PATCH /contracts/{id}
     @Test
     void shouldPatchContract() {
         // Read original state

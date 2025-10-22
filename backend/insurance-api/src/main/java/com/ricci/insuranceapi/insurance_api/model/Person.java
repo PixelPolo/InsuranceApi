@@ -1,7 +1,5 @@
 package com.ricci.insuranceapi.insurance_api.model;
 
-import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
-
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -27,10 +25,5 @@ public class Person extends Client {
 
     @Column()
     private LocalDate birthdate;
-
-    public Person(PersonDto dto) {
-        super(dto);
-        this.birthdate = dto.getBirthdate();
-    }
 
 }

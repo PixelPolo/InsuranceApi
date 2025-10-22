@@ -93,7 +93,7 @@ public class ClientRepositoryTest extends InsuranceApiApplicationTests {
         }
     }
 
-    // Create -> Insert New Company
+    // Create -> Insert New Company (Client's child)
     @Test
     void shouldCreateNewCompany() {
         String name = "ACME Corp";
@@ -127,6 +127,7 @@ public class ClientRepositoryTest extends InsuranceApiApplicationTests {
     // --- Update Client ---
     // ---------------------
 
+    // Update -> Partial update a Client
     @Test
     void shouldUpdateClient() {
         Client client = clientRepository.findAll().get(0);

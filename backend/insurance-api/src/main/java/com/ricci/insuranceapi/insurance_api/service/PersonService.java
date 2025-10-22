@@ -1,6 +1,7 @@
 package com.ricci.insuranceapi.insurance_api.service;
 
 import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
+import com.ricci.insuranceapi.insurance_api.mapper.ClientMapper;
 import com.ricci.insuranceapi.insurance_api.model.Person;
 import com.ricci.insuranceapi.insurance_api.repository.PersonRepository;
 
@@ -14,11 +15,16 @@ public class PersonService {
 
     private final PersonRepository personRepository;
     private final ClientService clientService;
+    private final ClientMapper clientMapper;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, ClientService clientService) {
+    public PersonService(
+            PersonRepository personRepository,
+            ClientService clientService,
+            ClientMapper clientMapper) {
         this.personRepository = personRepository;
         this.clientService = clientService;
+        this.clientMapper = clientMapper;
     }
 
     // ----------------------
@@ -34,7 +40,7 @@ public class PersonService {
     // ----------------------
 
     public Person createPerson(PersonDto dto) {
-        Person person = new Person(dto);
+        Person person = (Person) clientMapper.toEntity(dto);
         clientService.validateUniquePhoneOrEmail(person);
         return personRepository.save(person);
     }

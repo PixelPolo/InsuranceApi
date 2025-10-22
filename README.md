@@ -70,6 +70,7 @@ If you want to delete absolutely everything Docker-related
 (containers, images, networks, and volumes that are not currently used):
 
 ```bash
+# WARNING This command will also delete non–project-related containers, images, and volumes.
 docker compose down -v --rmi all
 ```
 
@@ -77,13 +78,13 @@ docker compose down -v --rmi all
 
 The following diagram was created using draw.io:
 
-<p><img src="./database/diagram/ERDiagram.drawio.png" alt="ER Diagram" width="600"/></p>
+<p><img src="./database/diagram/ERDiagram.drawio.png" alt="ER Diagram" width="800"/></p>
 
-I chose to implement a generalization/specialization relationship between Client, Person, and Company.  
-The init.sql script provides an implementation of this schema.  
-The script is intentionally simple and does not include business logic,  
-such as automatically updating contract dates when a client is deleted.  
-That behavior is instead implemented in the backend application.
+- I chose to implement a generalization/specialization relationship between Client, Person, and Company.  
+- The init.sql script provides an implementation of this schema.  
+- The script is intentionally simple and does not include business logic,  
+  such as automatically updating contract dates when a client is deleted.  
+- That behavior is instead implemented in the backend application.
 
 ## Step 2: Docker setup
 
@@ -98,4 +99,89 @@ For simplicity, environment variables are hardcoded in
 
 ## Step 4: Backend implementation
 
-In progres...
+- Layered architecture:
+  - Controller → Service → Repository → Model  
+    (with Mapper bridging between Model and DTO)
+
+Folder structure:
+
+```
+src
+...
+└───insurance_api
+  ├───controller
+  ├───dto
+  ├───exception
+  ├───mapper
+  ├───model
+  ├───repository
+  ├───service
+  ├───utils
+  └───validation
+
+tests:
+...
+└───insurance_api
+    ├───controller
+    ├───mapper
+    ├───model
+    ├───repository
+    └───service
+```
+
+Endpoints
+
+```
+  GET     /api/v*/clients
+  GET     /api/v*/clients?page=...&size=...&sortBy=...&sortDir=...
+  GET     /api/v*/clients/{id}
+  GET     /api/v*/clients/{id}/contracts/active
+  GET     /api/v*/clients/{id}/contracts/costsum
+  GET     /api/v*/clients/{id}/contracts/after?date=2025-01-01T00:00:00
+
+  PATCH   /api/v*/clients/{id}
+  DELETE  /api/v*/clients/{id}
+
+  POST    /api/v*/clients/companies
+  GET     /api/v*/clients/companies
+  GET     /api/v*/clients/companies?page=...&size=...&sortBy=...&sortDir=...
+
+  POST    /api/v*/clients/persons
+  GET     /api/v*/clients/persons
+  GET     /api/v*/clients/persons?page=...&size=...&sortBy=...&sortDir=...
+
+  GET     /api/v*/contracts
+  GET     /api/v*/contracts?page=0&size=5&sortBy=...&sortDir=...
+  GET     /api/v*/contracts/{id}
+  POST    /api/v*/contracts
+  PATCH   /api/v*/contracts/{id}
+  DELETE  /api/v*/contracts/{id}
+```
+
+Main design decisions:
+
+- Created an abstract Client class.
+- Used DTOs to hide internal model details.
+- Implemented custom mappers instead of MapStruct for more control.
+- Used JPA lifecycle annotations (@PrePersist, @PostPersist, @PreUpdate) to auto-update attributes.
+- Added custom SQL queries for active-contract and performant cost-sum endpoints.
+- Implemented attribute validation using Jakarta Validation (JSR-380).
+- Enforced ISO 8601 date format using Java’s built-in LocalDate and LocalDateTime classes.
+- Designed REST responses to include fully resolved relationships in JSON.
+
+## Step 5: Validation and Tests
+
+To validate the implementation,
+
+1. start the containers
+
+2. stop only the backend container (it uses the same port as tests):
+
+```bash
+docker compose up -d
+docker stop insurance_api
+```
+
+3. Run all JUnit and integration tests
+
+4. To see the complete list of tests, open: `./tests-list.md`

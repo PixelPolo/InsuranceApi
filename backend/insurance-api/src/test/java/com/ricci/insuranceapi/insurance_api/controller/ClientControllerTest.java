@@ -337,6 +337,7 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
     // --- GET /clients/{id}/contracts/active ---
     // ------------------------------------------
 
+    // GET /clients/{id}/contracts/active
     @Test
     void shouldGetActiveContractsForClient() {
         String firstClientId = getFirstClientId();
@@ -416,6 +417,7 @@ class ClientControllerIntegrationTest extends InsuranceApiApplicationTests {
     // --- GET /clients/{id}/contracts/costsum ---
     // -------------------------------------------
 
+    // GET /clients/{id}/contracts/costsum
     @Test
     void shouldGetContractsSummary() {
         String firstClientId = getFirstClientId();

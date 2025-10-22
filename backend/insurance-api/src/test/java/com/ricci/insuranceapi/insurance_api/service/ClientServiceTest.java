@@ -100,7 +100,7 @@ class ClientServiceTest extends InsuranceApiApplicationTests {
     // --- Update clients ---
     // ----------------------
 
-    // Partial update
+    // Update -> Partial update
     @Test
     void shouldPartiallyUpdateClient() {
         ClientPatchDto update = new ClientPatchDto();

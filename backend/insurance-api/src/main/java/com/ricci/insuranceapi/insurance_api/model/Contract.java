@@ -25,10 +25,12 @@ import jakarta.persistence.ForeignKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "contract")
 @Data
+@ToString(exclude = "client")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Contract {
