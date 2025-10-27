@@ -2,10 +2,6 @@ package com.ricci.insuranceapi.insurance_api.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import com.ricci.insuranceapi.insurance_api.dto.ClientDto;
 import com.ricci.insuranceapi.insurance_api.dto.CompanyDto;
 import com.ricci.insuranceapi.insurance_api.dto.PersonDto;
@@ -20,11 +16,12 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
+/**
+ * Unit tests for ClientMapper to verify correct entity <-> DTO conversions.
+ */
+
 class ClientMapperTest {
 
-    @Autowired
     private ClientMapper clientMapper;
 
     private Person samplePerson;
@@ -32,6 +29,8 @@ class ClientMapperTest {
 
     @BeforeEach
     void setup() {
+        clientMapper = new ClientMapper();
+
         samplePerson = new Person();
         samplePerson.setClientId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         samplePerson.setName("Alice Dupont");

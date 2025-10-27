@@ -6,14 +6,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.ricci.insuranceapi.insurance_api.InsuranceApiApplicationTests;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
-
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,8 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Inspired by Spring Academy materials
  */
 
-@SpringBootTest
-@ActiveProfiles("test")
 public class ContractRepositoryTest extends InsuranceApiApplicationTests {
 
     @Autowired
@@ -40,7 +34,6 @@ public class ContractRepositoryTest extends InsuranceApiApplicationTests {
 
     // Read -> Find All Contracts
     @Test
-    @Transactional // Keep the database session open until all related Client are fetched
     void shouldFindAllContracts() {
         List<Contract> contracts = contractRepository.findAll();
 
@@ -53,7 +46,6 @@ public class ContractRepositoryTest extends InsuranceApiApplicationTests {
 
     // Read -> Find By ID
     @Test
-    @Transactional
     void shouldFindContractById() {
         Contract first = contractRepository.findAll().get(0);
         Contract found = contractRepository.findById(first.getContractId()).orElse(null);

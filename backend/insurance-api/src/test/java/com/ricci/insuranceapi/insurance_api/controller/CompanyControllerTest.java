@@ -17,7 +17,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
 
@@ -32,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 class CompanyControllerIntegrationTest extends InsuranceApiApplicationTests {
 
     private static final String PATH = BASE_PATH + "clients/companies";

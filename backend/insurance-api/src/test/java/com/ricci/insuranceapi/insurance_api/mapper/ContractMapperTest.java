@@ -6,9 +6,6 @@ import com.ricci.insuranceapi.insurance_api.model.Person;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,11 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for ContractMapper to verify correct entity <-> DTO conversions.
  */
 
-@SpringBootTest
-@ActiveProfiles("test")
 class ContractMapperTest {
 
-    @Autowired
     private ContractMapper contractMapper;
 
     private Person sampleClient;
@@ -36,6 +30,8 @@ class ContractMapperTest {
 
     @BeforeEach
     void setup() {
+        contractMapper = new ContractMapper(new ClientMapper());
+
         sampleClient = new Person();
         sampleClient.setClientId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         sampleClient.setName("Alice Dupont");

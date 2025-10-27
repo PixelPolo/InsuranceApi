@@ -6,10 +6,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.ricci.insuranceapi.insurance_api.InsuranceApiApplicationTests;
 import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
@@ -18,8 +16,6 @@ import com.ricci.insuranceapi.insurance_api.exception.ClientNotFoundException;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
 import com.ricci.insuranceapi.insurance_api.model.Person;
-
-import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,9 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Inspired by Spring Academy materials.
  */
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
 class ClientServiceTest extends InsuranceApiApplicationTests {
 
     @Autowired
