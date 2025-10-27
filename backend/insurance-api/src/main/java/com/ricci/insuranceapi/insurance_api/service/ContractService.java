@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ricci.insuranceapi.insurance_api.dto.ContractDto;
 import com.ricci.insuranceapi.insurance_api.dto.ContractPatchDto;
@@ -50,6 +51,7 @@ public class ContractService {
     // --- Create contracts ---
     // ------------------------
 
+    @Transactional
     public Contract createContract(ContractDto dto, Client client) {
         Contract contract = contractMapper.toEntity(dto, client);
         return contractRepository.save(contract);
@@ -59,6 +61,7 @@ public class ContractService {
     // --- Update contracts ---
     // ------------------------
 
+    @Transactional
     public Contract partialUpdate(UUID id, ContractPatchDto update) {
         Contract existing = this.getContract(id);
         Contract patchEntity = contractMapper.toEntityFromUpdate(update);
@@ -75,6 +78,7 @@ public class ContractService {
     // --- Delete contracts ---
     // ------------------------
 
+    @Transactional
     public Contract deleteContract(UUID id) {
         // Soft delete according to requirements
         Contract contract = this.getContract(id);
@@ -87,6 +91,7 @@ public class ContractService {
         }
     }
 
+    @Transactional
     public Contract forceCloseContract(UUID id) {
         // Replace any end date (also if not null) to now
         Contract contract = this.getContract(id);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ricci.insuranceapi.insurance_api.dto.ClientPatchDto;
 import com.ricci.insuranceapi.insurance_api.exception.ClientInvalidDataException;
@@ -44,6 +45,7 @@ public class ClientService {
     // --- Update clients ---
     // ----------------------
 
+    @Transactional
     public Client partialUpdate(UUID id, ClientPatchDto update) {
         Client existing = this.getClient(id);
 
@@ -67,6 +69,7 @@ public class ClientService {
     // --- Delete clients ---
     // ----------------------
 
+    @Transactional
     public Client deleteClient(UUID id) {
         // Soft delete for archives
         Client client = this.getClient(id);

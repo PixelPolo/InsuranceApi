@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CompanyService {
@@ -40,6 +41,7 @@ public class CompanyService {
     // --- Create company ---
     // ----------------------
 
+    @Transactional
     public Company createCompany(CompanyDto dto) {
         Company company = (Company) clientMapper.toEntity(dto);
         checkUniqueCompanyIdentifier(company.getCompanyIdentifier());

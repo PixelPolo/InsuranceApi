@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PersonService {
@@ -39,6 +40,7 @@ public class PersonService {
     // --- Create persons ---
     // ----------------------
 
+    @Transactional
     public Person createPerson(PersonDto dto) {
         Person person = (Person) clientMapper.toEntity(dto);
         clientService.validateUniquePhoneOrEmail(person);
