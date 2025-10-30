@@ -4,31 +4,37 @@
 
 package com.ricci.insuranceapi.insurance_api.model;
 
-import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
-import jakarta.persistence.Table;
 import jakarta.persistence.InheritanceType;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name = "client")
-@Inheritance(strategy = InheritanceType.JOINED)
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Table(name = "client")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Client {
 
     @Id
     @GeneratedValue
+    @EqualsAndHashCode.Include
     @Column(name = "client_id", updatable = false, nullable = false)
     private UUID clientId;
 

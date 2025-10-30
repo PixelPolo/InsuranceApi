@@ -17,7 +17,6 @@ import com.ricci.insuranceapi.insurance_api.exception.ContractNotFoundException;
 import com.ricci.insuranceapi.insurance_api.mapper.ContractMapper;
 import com.ricci.insuranceapi.insurance_api.model.Client;
 import com.ricci.insuranceapi.insurance_api.model.Contract;
-import com.ricci.insuranceapi.insurance_api.repository.ClientRepository;
 import com.ricci.insuranceapi.insurance_api.repository.ContractRepository;
 
 @Service
@@ -29,7 +28,6 @@ public class ContractService {
     @Autowired
     public ContractService(
             ContractRepository contractRepository,
-            ClientRepository clientRepository,
             ContractMapper contractMapper) {
         this.contractRepository = contractRepository;
         this.contractMapper = contractMapper;

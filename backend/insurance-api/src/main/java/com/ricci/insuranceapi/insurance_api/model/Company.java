@@ -2,21 +2,24 @@ package com.ricci.insuranceapi.insurance_api.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.ForeignKey;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name = "company")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @EqualsAndHashCode(callSuper = true)
+@Table(name = "company")
 public class Company extends Client {
 
     @PrimaryKeyJoinColumn(name = "client_id", foreignKey = @ForeignKey(name = "fk_company_client_id"))
